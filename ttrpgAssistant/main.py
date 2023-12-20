@@ -27,19 +27,6 @@ class MainWindow(T.QMainWindow):
 
         self.setCentralWidget(tab_widget)
 
-    def load_settings(self):            
-        tab3_state = self.settings.value("tab3_state")
-        if tab3_state is not None:
-            self.encounter_tab.set_state(tab3_state)
-
-    def save_settings(self):
-        tab3_state = self.encounter_tab.get_state()
-        self.settings.setValue("tab3_state", tab3_state)
-        
-    def closeEvent(self, event):
-        self.save_settings()
-        event.accept()
-
 def main():
     app = T.QApplication(T.sys.argv)
     window = MainWindow()

@@ -4,7 +4,7 @@ import random
 import string
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit
 
 GEO_FEATURES = ["Anticline", "Basin", "Butte", "Cave", "Cliff", "Canyon", "Valley", "Bay", "Archipelago"]
 BIOMES = ["Arboreal", "Artificial", "Desert", "Grasslands", "Lunar", "Mountainous", "Oceanic", "Rainforest", "Starship", "Terraformed", "Toxic", "Tundra", "Subterranean", "Swamp", "Urban", "Volcanic"]
@@ -106,6 +106,8 @@ class PlanetGeneratorTab(QWidget):
         self.biome = BIOMES
 
         layout = QVBoxLayout()
+        self.text_edit = QTextEdit()
+        layout.addWidget(self.text_edit)
         self.generate_button = QPushButton("Generate Planet")
         layout.addWidget(self.generate_button)
 
@@ -163,6 +165,9 @@ class PlanetGeneratorTab(QWidget):
         markdown_content = f"The new planet's biome is {currentBiome}\nThe nearby geological features are: {currentGeoFeatures}"
         file_name = self.create_planet_file(markdown_content, unique_name, FOLDER_PATH)  # Pass FOLDER_PATH as an argument
 
+        with open('C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets/PJL-369.md', 'r') as f:
+            markdown_text = f.read()
+        self.text_edit.setMarkdown(markdown_text)
         # Update the QLabel with the message
         self.message_label.setText(f"Markdown file '{file_name}' created in '{FOLDER_PATH}'")
 
