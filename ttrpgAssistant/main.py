@@ -8,11 +8,11 @@ class ApplicationSettings:
         self.tab3_state = {}
         # ... add state attributes for each tab as needed ...
 
-class EncounterTab(Tab):
+class EncounterTab(T.Tab):
     def __init__(self):
         super().__init__()
-
-        nested_tab_widget = QTabWidget()
+        layout = T.QVBoxLayout()
+        nested_tab_widget = T.QTabWidget()
 
         diplomatic_tab = T.DiplomaticEncounter()
         nested_tab_widget.addTab(diplomatic_tab, "Diplomatic Function")
@@ -29,14 +29,14 @@ class EncounterTab(Tab):
         # randd_tab = RandDTab()
         # nested_tab_widget.addTab(randd_tab, "Research and Development")
 
-        T.layout.addWidget(nested_tab_widget)
-        self.setLayout(T.layout)
+        layout.addWidget(nested_tab_widget)
+        self.setLayout(layout)
         
-        self.save_button = QPushButton("Save")
+        self.save_button = T.QPushButton("Save")
         self.save_button.clicked.connect(self.save_state)
-        T.layout.addWidget(self.save_button)
+        layout.addWidget(self.save_button)
 
-        self.setLayout(T.layout)
+        self.setLayout(layout)
 
         # Hypothetical state variables
         self.some_state_variable = ""
@@ -68,9 +68,9 @@ class MainWindow(T.QMainWindow):
         self.setGeometry(100, 100, 800, 600)
 
         tab_widget = T.QTabWidget()
-        self.planet_tab = T.PlanetGeneratorTab()
-        self.society_tab = T.SocietyGeneratorTab()
-        self.encounter_tab = T.EncounterTab()
+        self.planet_tab = T.PlanetGenerator()
+        self.society_tab = T.SocietyGenerator()
+        self.encounter_tab = EncounterTab()
 
         tab_widget.addTab(self.planet_tab, "Planet Generator")
         tab_widget.addTab(self.society_tab, "Society Generator")

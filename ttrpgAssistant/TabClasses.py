@@ -19,22 +19,23 @@ class Tab(QWidget):
     
     def __init__(self):
         super().__init__()
-        layout = QVBoxLayout()
+        
 
 class SocietyGenerator(Tab):
     def __init__(self):
         super().__init__()
         CURRENTALIABIL = []
+        layout = QVBoxLayout()
         self.generate_button = QPushButton("Generate Society")
-        Tab.layout.addWidget(self.generate_button)
+        layout.addWidget(self.generate_button)
         
         self.file_name_input = QLineEdit()
-        Tab.layout.addWidget(self.file_name_input)
+        layout.addWidget(self.file_name_input)
         
         self.message_label = QLabel()
-        Tab.layout.addWidget(self.message_label)
+        layout.addWidget(self.message_label)
 
-        self.setLayout(Tab.layout)
+        self.setLayout(layout)
         self.generate_button.clicked.connect(self.generate_society)
 
     def choose_random_value(self, source_list):
@@ -104,17 +105,17 @@ class SocietyGenerator(Tab):
 class PlanetGenerator(Tab):
     def __init__(self):
         super().__init__()
-
+        layout = QVBoxLayout()
         self.text_edit = QTextEdit()
-        Tab.layout.addWidget(self.text_edit)
+        layout.addWidget(self.text_edit)
         self.generate_button = QPushButton("Generate Planet")
-        Tab.layout.addWidget(self.generate_button)
+        layout.addWidget(self.generate_button)
 
         # Create a QLabel to display the message
         self.message_label = QLabel()
-        Tab.layout.addWidget(self.message_label)
+        layout.addWidget(self.message_label)
 
-        self.setLayout(Tab.layout)
+        self.setLayout(layout)
 
         self.generate_button.clicked.connect(self.generate_planet)
     
@@ -173,13 +174,13 @@ class PlanetGenerator(Tab):
 class ConvinceEncounter(Tab):
     def __init__(self):
         super().__init__()
-
+        layout = QVBoxLayout()
         self.generate_button = QPushButton("Run Convince Encounter")
-        Tab.layout.addWidget(self.generate_button)
+        layout.addWidget(self.generate_button)
 
         self.generate_button.clicked.connect(self.convince_encounter)
 
-        self.setLayout(Tab.layout)
+        self.setLayout(layout)
     
     def update_threshold(self, condition):
         if condition == "less":
@@ -241,11 +242,12 @@ class ConvinceEncounter(Tab):
 class DiplomaticEncounter(Tab):
     def __init__(self):
         super().__init__()
+        layout = QVBoxLayout()
         generate_button = QPushButton("Run Diplomatic Function")
-        Tab.layout.addWidget(generate_button)
+        layout.addWidget(generate_button)
         generate_button.clicked.connect(self.diplomatic_function)
 
-        self.setLayout(Tab.layout)
+        self.setLayout(layout)
 
     def moxie_roll(self, name):
         return random.randint(1, 20)
@@ -357,7 +359,7 @@ class DiplomaticEncounter(Tab):
 class InfiltrationEncounter(Tab):
     def __init__(self):
         super().__init__()
-
+        layout = QVBoxLayout()
         self.setWindowTitle("Slider Demo")
         self.setGeometry(100, 100, 400, 150)
         self.slider = QSlider(Qt.Horizontal)
@@ -369,10 +371,10 @@ class InfiltrationEncounter(Tab):
 
         self.label = QLabel("Oblivious")
 
-        Tab.layout.addWidget(self.slider)
-        Tab.layout.addWidget(self.label)
+        layout.addWidget(self.slider)
+        layout.addWidget(self.label)
 
-        self.setLayout(Tab.layout)  # Set the layout for this specific tab
+        self.setLayout(layout)  # Set the layout for this specific tab
 
     def slider_changed(self):
         positions = ["Oblivious", "Suspicious", "Investigating", "Alarmed", "Chasing"]
