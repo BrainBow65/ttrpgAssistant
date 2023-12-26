@@ -1,12 +1,5 @@
 import TabClasses as T
-
-class ApplicationSettings:
-    def __init__(self):
-        # Initialize default settings here
-        self.tab1_state = {}
-        self.tab2_state = {}
-        self.tab3_state = {}
-        # ... add state attributes for each tab as needed ...
+import persistant_data as P
 
 class EncounterTab(T.Tab):
     def __init__(self):
@@ -42,23 +35,6 @@ class EncounterTab(T.Tab):
         self.some_state_variable = ""
         self.another_state_variable = 0
 
-    def set_state(self, state):
-        # Set the state of this tab based on the provided 'state' dictionary
-        self.some_state_variable = state.get("some_state_variable", "")
-        self.another_state_variable = state.get("another_state_variable", 0)
-
-    def get_state(self):
-        # Get the current state of this tab as a dictionary
-        return {
-            "some_state_variable": self.some_state_variable,
-            "another_state_variable": self.another_state_variable,
-        }
-    def save_state(self):
-        # When the Save button is clicked, save the state
-        state = self.get_state()
-        # You can save this state to a file or use it as needed
-        print("State saved:", state)  
-
 class MainWindow(T.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -79,9 +55,11 @@ class MainWindow(T.QMainWindow):
         self.setCentralWidget(tab_widget)
 
 def main():
+    game_data = P.IDataPersistence()
     app = T.QApplication(T.sys.argv)
     window = MainWindow()
     window.show()
+    app.aboutToQuit.connect(P.IDataPersistence.save())
     T.sys.exit(app.exec_())
 
 if __name__ == '__main__':

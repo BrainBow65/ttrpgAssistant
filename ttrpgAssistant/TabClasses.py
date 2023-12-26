@@ -45,7 +45,7 @@ class SocietyGenerator(Tab):
         govNum = random.randint(1, 5)
         religNum = random.randint(1, 5)
         currentTechLvl = [random.randint(1, 5)]
-        currentAlien = [self.choose_random_value(Tab.ALIEN_TYPES) if random.random() < 0.7 else ALIEN_TYPES[0]]
+        currentAlien = [self.choose_random_value(Tab.ALIEN_TYPES) if random.random() < 0.7 else Tab.ALIEN_TYPES[0]]
         currentGovType = [self.choose_random_value(Tab.GOV_TYPES) for _ in range(govNum)]
         currentCulture = [self.choose_random_value(Tab.CULTURE_TYPES) for _ in range(govNum)]
         currentRelig = [self.choose_random_value(Tab.RELIGION_TYPES) for _ in range(religNum)]
@@ -362,7 +362,7 @@ class InfiltrationEncounter(Tab):
         layout = QVBoxLayout()
         self.setWindowTitle("Slider Demo")
         self.setGeometry(100, 100, 400, 150)
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Vertical)
         self.slider.setRange(0, 4)
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(QSlider.TicksBelow)
@@ -380,3 +380,28 @@ class InfiltrationEncounter(Tab):
         positions = ["Oblivious", "Suspicious", "Investigating", "Alarmed", "Chasing"]
         value = self.slider.value()
         self.label.setText(f"{positions[value]}")
+        return value # important for save state tracking
+
+class Combatant:
+    def __init__(self, name, hp, ac, attack_bonus, damage_bonus):
+        self.name = name
+        self.max_hp = hp
+        self.hp = hp
+        self.ac = ac
+        self.attack_bonus = attack_bonus
+        self.damage_bonus = damage_bonus
+
+    def attack(self, target):
+        roll = random.randint(1, 20) + self.attack_bonus
+        if roll >= target.ac:
+            damage = random.randint(1, 6) + self.damage_bonus
+            target.hp -= damage
+            print(f"{self.name} attacks {target.name} for {damage} damage.")
+        else:
+            print(f"{self.name}'s attack misses.")
+
+    def heal(self, amount):
+        self.hp += amount
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+        print(f"{self.name} heals for {amount} HP.")
