@@ -6,7 +6,8 @@ from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit
 
-class Tab(QWidget):
+class CoreRulebookValues(QWidget):
+    FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets"
     GEO_FEATURES = ["Anticline", "Basin", "Butte", "Cave", "Cliff", "Canyon", "Valley", "Bay", "Archipelago"]
     BIOMES = ["Arboreal", "Artificial", "Desert", "Grasslands", "Lunar", "Mountainous", "Oceanic", "Rainforest", "Starship", "Terraformed", "Toxic", "Tundra", "Subterranean", "Swamp", "Urban", "Volcanic"]
     ALIEN_TYPES = ["Human", "Asgaridan", "Androids", "Aris bochs people", "Reol", "Nox", "Serrakin", "Mimetic aliens", "reetou", "replicators", "Goa'uld", "Jaffa", "Arturen", "Tok'ra", "Unas", "Unknown"]
@@ -14,14 +15,38 @@ class Tab(QWidget):
     CULTURE_TYPES = ["National", "Religion", "Ethnic Group", "Social Class", "Generational", "Organizational", "Gender"]
     RELIGION_TYPES = ["Goa'uld", "Asgardism", "Monotheism", "Polytheism, hard", "Polytheism soft", "Polytheism, henotheism", "Polytheism, Kathenotheism", "Polytheism, Monolatrism", "Pantheism", "Deism", "Autotheism", "Value-judgement theism, Eutheism", "Value-judgement theism, dystheism", "Value-judgement theism, maltheism", "Value-judgement theism, misotheism", "Spiritualism", "Atheism"]
     SPECIALABIL = ["amphibious breath", "apex predator", "armoured", "beast of burden", "bioluminescent", "blind sight", "blood frenzy", "camouflage", "charge", "climb", "constrict", "crystalline", "dark vision", "echo location", "extra legs", "fast", "flight", "flightless", "hold breath", "improved ability", "improved attribute", "keen sense", "larger", "lumbering", "mimicry", "move by", "multiattack", "natural weapon", "pack tactics", "pounce", "powerful attack", "proficient", "relentless", "skilled", "spider climb", "standing leap", "superior natural attacks", "sure-footed", "swarm", "swimmer", "tough", "venomous", "webbing"]
-    FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets"
-    
+    #stats organized {CR: [prof., size, str, dex, con, int, wis, cha, ac, hp, speed, dmg]}  
+    BEAST_STATS_DICT = {0:[0, "Tiny", 2, 16, 6, 1, 10, 2, 12, 1, 4, "1d2"],
+                  0.125:[1, 'Tiny', 3, 16, 6, 1, 10, 2, 12, 3, 4, '1d2'],
+                  0.25:[1, 'Tiny', 4, 16, 6, 1, 10, 2, 12, 7, 4, '1d3'],
+                  0.5:[1, 'Tiny', 5, 16, 6, 1, 10, 2, 12, 10, 4, '1d3'],
+                  1:[2, 'Small', 6, 14, 8, 1, 10, 2, 12, 15, 6, '1d4'],
+                  2:[],
+                  3:[],
+                  4:[],
+                  5:[],
+                  6:[],
+                  7:[],
+                  8:[],
+                  9:[],
+                  10:[],
+                  11:[],
+                  12:[],
+                  13:[],
+                  14:[],
+                  15:[],
+                  16:[],
+                  17:[],
+                  18:[],
+                  19:[],
+                  20:[]}
+    BEAST_TYPES = ['amphibious', 'aquatic', 'avian', 'biped', 'crustacean', 'insect', 'quadruped', 'serpentine']
     
     def __init__(self):
         super().__init__()
         
 
-class SocietyGenerator(Tab):
+class SocietyGenerator(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         CURRENTALIABIL = []
@@ -45,10 +70,10 @@ class SocietyGenerator(Tab):
         govNum = random.randint(1, 5)
         religNum = random.randint(1, 5)
         currentTechLvl = [random.randint(1, 5)]
-        currentAlien = [self.choose_random_value(Tab.ALIEN_TYPES) if random.random() < 0.7 else Tab.ALIEN_TYPES[0]]
-        currentGovType = [self.choose_random_value(Tab.GOV_TYPES) for _ in range(govNum)]
-        currentCulture = [self.choose_random_value(Tab.CULTURE_TYPES) for _ in range(govNum)]
-        currentRelig = [self.choose_random_value(Tab.RELIGION_TYPES) for _ in range(religNum)]
+        currentAlien = [self.choose_random_value(CoreRulebookValues.ALIEN_TYPES) if random.random() < 0.7 else CoreRulebookValues.ALIEN_TYPES[0]]
+        currentGovType = [self.choose_random_value(CoreRulebookValues.GOV_TYPES) for _ in range(govNum)]
+        currentCulture = [self.choose_random_value(CoreRulebookValues.CULTURE_TYPES) for _ in range(govNum)]
+        currentRelig = [self.choose_random_value(CoreRulebookValues.RELIGION_TYPES) for _ in range(religNum)]
 
         if "Unknown" in currentAlien:
             Alien = CURRENTALIABIL
@@ -66,7 +91,7 @@ class SocietyGenerator(Tab):
 
     def AlienSpeciesGenerator(self, CURRENTALIABIL):
         num_values = random.randint(1, 2)
-        chosen_values = random.sample(Tab.ALIEN_TYPES, num_values)
+        chosen_values = random.sample(CoreRulebookValues.ALIEN_TYPES, num_values)
         CURRENTALIABIL.extend(chosen_values)
         return CURRENTALIABIL
     
@@ -89,7 +114,7 @@ class SocietyGenerator(Tab):
     
         file_name += ".md"
     
-        existing_file_path = self.search_markdown_file(file_name, Tab.FOLDER_PATH)
+        existing_file_path = self.search_markdown_file(file_name, CoreRulebookValues.FOLDER_PATH)
     
         if existing_file_path is not None:
             self.append_to_markdown_file(existing_file_path, "contents")
@@ -100,9 +125,9 @@ class SocietyGenerator(Tab):
             self.append_to_markdown_file(existing_file_path, contents)
             self.message_label.setText(f"the following has been appended '{existing_file_path}'")
         else:  
-            self.message_label.setText(f"The file '{file_name}.md' could not be found in '{Tab.FOLDER_PATH}'.")
+            self.message_label.setText(f"The file '{file_name}.md' could not be found in '{CoreRulebookValues.FOLDER_PATH}'.")
 
-class PlanetGenerator(Tab):
+class PlanetGenerator(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -125,7 +150,7 @@ class PlanetGenerator(Tab):
         return currentGeoFeatures
     
     def choose_biome(self):
-        return random.choice(Tab.BIOMES)
+        return random.choice(CoreRulebookValues.BIOMES)
     
     def generate_name(self):
         prefix = "P"
@@ -158,20 +183,20 @@ class PlanetGenerator(Tab):
         currentBiome = self.choose_biome()
 
         name = self.generate_name()
-        while not self.check_name_availability(name, Tab.FOLDER_PATH):  # Pass FOLDER_PATH as the second argument
+        while not self.check_name_availability(name, CoreRulebookValues.FOLDER_PATH):  # Pass FOLDER_PATH as the second argument
             name = self.generate_name()
 
-        unique_name = self.generate_unique_name(Tab.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
+        unique_name = self.generate_unique_name(CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
         markdown_content = f"The new planet's biome is {currentBiome}\nThe nearby geological features are: {currentGeoFeatures}"
-        file_name = self.create_planet_file(markdown_content, unique_name, Tab.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
+        file_name = self.create_planet_file(markdown_content, unique_name, CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
 
         with open('C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets/PJL-369.md', 'r') as f:
             markdown_text = f.read()
         self.text_edit.setMarkdown(markdown_text)
         # Update the QLabel with the message
-        self.message_label.setText(f"Markdown file '{file_name}' created in '{Tab.FOLDER_PATH}'")
+        self.message_label.setText(f"Markdown file '{file_name}' created in '{CoreRulebookValues.FOLDER_PATH}'")
 
-class ConvinceEncounter(Tab):
+class ConvinceEncounter(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -239,7 +264,7 @@ class ConvinceEncounter(Tab):
             if self.calculate_round_result(threshold, determination_point_wager, num_players):
                 break
 
-class DiplomaticEncounter(Tab):
+class DiplomaticEncounter(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -356,7 +381,7 @@ class DiplomaticEncounter(Tab):
             if another_round == "no":
                 break
     
-class InfiltrationEncounter(Tab):
+class InfiltrationEncounter(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -374,7 +399,7 @@ class InfiltrationEncounter(Tab):
         layout.addWidget(self.slider)
         layout.addWidget(self.label)
 
-        self.setLayout(layout)  # Set the layout for this specific tab
+        self.setLayout(layout)  # Set the layout for this specific CoreRulebookValues
 
     def slider_changed(self):
         positions = ["Oblivious", "Suspicious", "Investigating", "Alarmed", "Chasing"]
@@ -382,14 +407,98 @@ class InfiltrationEncounter(Tab):
         self.label.setText(f"{positions[value]}")
         return value # important for save state tracking
 
+class Character:
+    def __init__(self, name, race, npc_class, lvl, hp, ac, speed, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, feats, field_hacks, gear, attacks):
+        self.name = name
+        self.race = race
+        self.npc_class = npc_class
+        self.lvl = lvl
+        self.hp = hp
+        self.ac = ac
+        self.speed = speed
+        self.str = str
+        self.dex = dex
+        self.con = con
+        self.int = int
+        self.wis = wis
+        self.cha = cha
+        self.skills = skills
+        self.saves = saves
+        self.feats = feats
+        self.field_hacks = field_hacks
+        self.gear = gear
+        self.attacks = attacks
+        self.proficiency_mod = proficiency_mod
+
+class NPC(Character):
+    def __init__(self):
+        super().__init__()
+
+
+class Beast(CoreRulebookValues):
+    #define class attributes here? similar to the encounter attributes it should be lists and dictionaries the book provides
+    
+    def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):
+        self.name = name
+        self.cr = cr #challenge rating
+        self.size = size
+        self.type = type
+        self.hp = hp
+        self.ac = ac
+        self.str = str
+        self.dex = dex
+        self.con = con
+        self.int = int
+        self.wis = wis
+        self.cha = cha
+        self.skills = skills
+        self.proficiency_mod = proficiency_mod
+        self.saves = saves
+        self.abilities = abilities
+        self.attacks = attacks
+    
+    def beak():
+        dmg_type = 'slashing'
+    
+    def bite():
+        dmg_type = 'piercing'
+    
+    def claw():
+        dmg_type = 'slashing'
+        quality = 'finesse'
+    
+    def hoof():
+        dmg_type = 'bludgeoning'
+    
+    def horn():
+        dmg_type = 'piercing'
+    
+    def slam():
+        dmg_type = 'bludgeoning'
+    
+    def sting():
+        dmg_type = 'piercing'
+        quality = 'finesse'
+    
+    def tail():
+        dmg_type = 'bludgeoning'
+    
+    def tusk():
+        dmg_type = 'slashing'
+    
+    def wing():
+        dmg_type = 'bludgeoning'
+    #I need to define all of the atributes of beasts based on their generated markdown files
+
 class Combatant:
-    def __init__(self, name, hp, ac, attack_bonus, damage_bonus):
+    def __init__(self, name, hp, ac, attack_bonus, damage_bonus, initiative):
         self.name = name
         self.max_hp = hp
         self.hp = hp
         self.ac = ac
         self.attack_bonus = attack_bonus
         self.damage_bonus = damage_bonus
+        self.initiative = initiative
 
     def attack(self, target):
         roll = random.randint(1, 20) + self.attack_bonus
@@ -405,3 +514,6 @@ class Combatant:
         if self.hp > self.max_hp:
             self.hp = self.max_hp
         print(f"{self.name} heals for {amount} HP.")
+
+class CombatGenerator:
+    pass

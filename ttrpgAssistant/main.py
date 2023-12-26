@@ -35,6 +35,26 @@ class EncounterTab(T.Tab):
         self.some_state_variable = ""
         self.another_state_variable = 0
 
+class CombatTab():
+    def __init__(self, combatants):
+        self.combatants = combatants
+
+    def initiative(self):
+        pass #determine initiative order
+
+    def run(self):
+        while True:
+            for combatant in self.combatants:
+                if combatant.hp <= 0:
+                    print(f"{combatant.name} is defeated.")
+                    self.combatants.remove(combatant)
+                else:
+                    target = T.random.choice([c for c in self.combatants if c != combatant])
+                    combatant.attack(target)
+            if len(self.combatants) <= 1:
+                break
+        print(f"{self.combatants[0].name} is the winner!")
+
 class MainWindow(T.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -47,10 +67,12 @@ class MainWindow(T.QMainWindow):
         self.planet_tab = T.PlanetGenerator()
         self.society_tab = T.SocietyGenerator()
         self.encounter_tab = EncounterTab()
+        self.combat_tab = CombatTab()
 
         tab_widget.addTab(self.planet_tab, "Planet Generator")
         tab_widget.addTab(self.society_tab, "Society Generator")
         tab_widget.addTab(self.encounter_tab, "Encounters")
+        tab_widget.addTab(self.combat_tab, "Combat")
 
         self.setCentralWidget(tab_widget)
 
