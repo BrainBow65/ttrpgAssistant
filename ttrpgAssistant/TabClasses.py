@@ -41,6 +41,25 @@ class CoreRulebookValues(QWidget):
                   19:[],
                   20:[]}
     BEAST_TYPES = ['amphibious', 'aquatic', 'avian', 'biped', 'crustacean', 'insect', 'quadruped', 'serpentine']
+    #vehicle attributes dictionary structure: {'vehicle':[techlvl, handling, type, speed(kph), passengers, hp, ac, size]}
+    VEHICLE_ATTRIBUTES = {'ATV':[2, 12, 'off-road', 100, 2, 60, 18, 'medium'],
+                          'Apache':[],
+                          'F-302':[],
+                          'Fixed-Wing':[],
+                          'F.R.E.D.':[],
+                          'Inflatable Boat':[],
+                          'Jeep':[],
+                          'M1 Tank':[],
+                          'M706':[],
+                          'M.A.L.P.':[],
+                          'Motorcycle':[],
+                          'Passenger Sedan':[],
+                          'U.A.V.':[]}
+    #vehicle weapons dictionary structure: {'weapon':[techlvl, damage die, type, range, cpaacity, special]}
+    VEHICLE_WEAPONS={'Autocannon':[2, '8d6', 'piercing', '100m/1km', 50, None],
+                     'Bomb':[2, '20d6', 'explosive', '', 5, 'see text?'],
+                     'Missile': [2, '20d6', 'explosive', '5km/200km', 4, 'guided'],
+                     'Railgun':[3, '8d6', 'piercing', '5km/400km',100, None]}
     
     def __init__(self):
         super().__init__()
@@ -517,3 +536,56 @@ class Combatant:
 
 class CombatGenerator:
     pass
+
+class Equipment:
+    def __init__(self, name, techlvl, bulk):
+        self.name = name
+        self.techlvl = techlvl
+        self.bulk = bulk
+
+class Weapons(Equipment):
+    def __init__(self, dmg, type, capacity, reload, range, special):
+        super().__init__()
+        self.dmg = dmg
+        self.type = type
+        self.capacity = capacity
+        self.reload = reload
+        self.range = range
+        self.special = special
+
+class Armor(Equipment):
+    def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
+        super().__init__()
+        self.techlvl = techlvl
+        self.type = type
+        self.ac = ac
+        self.strength = strength
+        self.stealth = stealth
+        self.special = special
+
+class Gear(Equipment):
+    def __init__(self, techlvl, bulk, description):
+        super().__init__()
+        self.techlvl = techlvl
+        self.description = description
+
+class Facilities:
+    def __init__(self, name, bonusrating, bonustype):
+        self.name = name
+        self.bonusrating = bonusrating
+        self.bonustype = bonustype
+
+class Vehicles:
+    def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
+        self.name = name
+        self.size = size
+        self.handling = handling
+        self.speed = speed
+        self.passengers = passengers
+        self.type = type
+        self.weapons = weapons
+        self.hp = hp
+        self.ac = ac
+
+
+
