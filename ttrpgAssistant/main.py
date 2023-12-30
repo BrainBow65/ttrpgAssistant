@@ -1,7 +1,6 @@
 import TabClasses as T
-import persistant_data as P
 
-class EncounterTab(T.Tab):
+class EncounterTab(T.CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = T.QVBoxLayout()
@@ -26,7 +25,7 @@ class EncounterTab(T.Tab):
         self.setLayout(layout)
         
         self.save_button = T.QPushButton("Save")
-        self.save_button.clicked.connect(self.save_state)
+        #self.save_button.clicked.connect(self.save_state)
         layout.addWidget(self.save_button)
 
         self.setLayout(layout)
@@ -35,8 +34,19 @@ class EncounterTab(T.Tab):
         self.some_state_variable = ""
         self.another_state_variable = 0
 
-class CombatTab():
+class GeneratorTab(T.QWidget):
+    def __init__(self):
+        super().__init__()
+        tab_widget = T.QTabWidget()
+        self.planet_tab = T.PlanetGenerator()
+        self.society_tab = T.SocietyGenerator()
+
+        tab_widget.addTab(self.planet_tab, "Planet Generator")
+        tab_widget.addTab(self.society_tab, "Society Generator")
+
+class CombatTab(T.QWidget):
     def __init__(self, combatants):
+        super().__init__()
         self.combatants = combatants
 
     def initiative(self):
@@ -56,6 +66,7 @@ class CombatTab():
         print(f"{self.combatants[0].name} is the winner!")
 
 class MainWindow(T.QMainWindow):
+    combat_objects = []
     def __init__(self):
         super().__init__()
 
@@ -63,25 +74,23 @@ class MainWindow(T.QMainWindow):
         self.setWindowTitle("StargateTTRPG App")
         self.setGeometry(100, 100, 800, 600)
 
-        tab_widget = T.QTabWidget()
-        self.planet_tab = T.PlanetGenerator()
-        self.society_tab = T.SocietyGenerator()
+        self.generator_tab = GeneratorTab()
         self.encounter_tab = EncounterTab()
-        self.combat_tab = CombatTab()
-
-        tab_widget.addTab(self.planet_tab, "Planet Generator")
-        tab_widget.addTab(self.society_tab, "Society Generator")
+        self.combat_tab = CombatTab(MainWindow.combat_objects)
+        
+        tab_widget = T.QTabWidget()
+        tab_widget.addTab(self.generator_tab, "Generator")
         tab_widget.addTab(self.encounter_tab, "Encounters")
         tab_widget.addTab(self.combat_tab, "Combat")
 
         self.setCentralWidget(tab_widget)
 
 def main():
-    game_data = P.IDataPersistence()
+    T.Registry.load_instances(T.Registry.directory)
     app = T.QApplication(T.sys.argv)
     window = MainWindow()
     window.show()
-    app.aboutToQuit.connect(P.IDataPersistence.save())
+    app.aboutToQuit.connect(T.Registry.save_instances(T.Registry.directory))
     T.sys.exit(app.exec_())
 
 if __name__ == '__main__':

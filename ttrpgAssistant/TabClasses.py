@@ -2,6 +2,9 @@ import sys
 import os
 import random
 import string
+import glob
+import yaml
+import re
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit
@@ -63,7 +66,57 @@ class CoreRulebookValues(QWidget):
     
     def __init__(self):
         super().__init__()
-        
+
+class Registry:
+    instances = {}
+    directory = 'c:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects' 
+    
+    @staticmethod
+    def add_instance(instance):
+        instance_class = type(instance).__name__
+        if instance_class not in Registry.instances:
+            Registry.instances[instance_class] = []
+        Registry.instances[instance_class].append(instance)
+
+    @staticmethod
+    def save_instances(directory):
+        for instance_class, instances in Registry.instances.items():
+            class_directory = os.path.join(directory, instance_class)
+            os.makedirs(class_directory, exist_ok=True)
+            for instance in instances:
+                filename = os.path.join(class_directory, f'{instance.name}.md')
+                front_matter = {attr: value for attr, value in instance.__dict__.items() if attr != 'name'}
+                # Read the existing content
+                with open(filename, 'r') as file:
+                    content = file.read()
+                    match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                    if match:
+                        # Update the front matter
+                        content = content.replace(match.group(0), f'---\n{yaml.dump(front_matter)}---\n')
+                    else:
+                        # Add the front matter if it doesn't exist
+                        content = f'---\n{yaml.dump(front_matter)}---\n{content}'
+                # Write the updated content back to the file
+                with open(filename, 'w') as file:
+                    file.write(content)
+
+    @staticmethod
+    def load_instances(directory):
+        Registry.instances = {}
+        for class_directory in glob.glob(os.path.join(directory, '*')):
+            instance_class = os.path.basename(class_directory)
+            Registry.instances[instance_class] = []
+            for filename in glob.glob(os.path.join(class_directory, '*.md')):
+                with open(filename, 'r') as file:
+                    content = file.read()
+                    match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                    if match:
+                        # Load the front matter
+                        front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
+                        # Create an instance of the class
+                        instance_class_obj = globals()[instance_class]
+                        instance = instance_class_obj(**front_matter)
+                        Registry.instances[instance_class].append(instance)
 
 class SocietyGenerator(CoreRulebookValues):
     def __init__(self):
@@ -454,8 +507,8 @@ class NPC(Character):
         super().__init__()
 
 
+
 class Beast(CoreRulebookValues):
-    #define class attributes here? similar to the encounter attributes it should be lists and dictionaries the book provides
     
     def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):
         self.name = name
@@ -475,6 +528,7 @@ class Beast(CoreRulebookValues):
         self.saves = saves
         self.abilities = abilities
         self.attacks = attacks
+
     
     def beak():
         dmg_type = 'slashing'
@@ -519,6 +573,7 @@ class Combatant:
         self.damage_bonus = damage_bonus
         self.initiative = initiative
 
+
     def attack(self, target):
         roll = random.randint(1, 20) + self.attack_bonus
         if roll >= target.ac:
@@ -553,6 +608,7 @@ class Weapons(Equipment):
         self.range = range
         self.special = special
 
+
 class Armor(Equipment):
     def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
         super().__init__()
@@ -563,17 +619,20 @@ class Armor(Equipment):
         self.stealth = stealth
         self.special = special
 
+
 class Gear(Equipment):
     def __init__(self, techlvl, bulk, description):
         super().__init__()
         self.techlvl = techlvl
         self.description = description
 
+
 class Facilities:
     def __init__(self, name, bonusrating, bonustype):
         self.name = name
         self.bonusrating = bonusrating
         self.bonustype = bonustype
+
 
 class Vehicles:
     def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
@@ -586,6 +645,3 @@ class Vehicles:
         self.weapons = weapons
         self.hp = hp
         self.ac = ac
-
-
-
