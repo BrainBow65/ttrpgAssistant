@@ -104,20 +104,41 @@ class Registry:
     @staticmethod
     def load_instances(directory):
         Registry.instances = {}
-        for class_directory in glob.glob(os.path.join(directory, '*')):
-            instance_class = os.path.basename(class_directory)
-            Registry.instances[instance_class] = []
-            for filename in glob.glob(os.path.join(class_directory, '*.md')):
-                with open(filename, 'r') as file:
-                    content = file.read()
-                    match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                    if match:
-                        # Load the front matter
-                        front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
-                        # Create an instance of the class
-                        instance_class_obj = globals()[instance_class]
-                        instance = instance_class_obj(**front_matter)
-                        Registry.instances[instance_class].append(instance)
+        CoreRulebookValues.PLANETS = []
+        CoreRulebookValues.ALIEN_TYPES = []
+        for root, dirs, files in os.walk(directory):
+            for dir in dirs:
+                class_directory = os.path.join(root, dir)
+                instance_class = os.path.basename(class_directory)
+                if instance_class not in Registry.instances:
+                    Registry.instances[instance_class] = {}
+                for subroot, subdirs, subfiles in os.walk(class_directory):
+                    for subdir in subdirs:
+                        sub_class_directory = os.path.join(subroot, subdir)
+                        sub_instance_class = os.path.basename(sub_class_directory)
+                        if sub_instance_class not in Registry.instances[instance_class]:
+                            Registry.instances[instance_class][sub_instance_class] = []
+                        for filename in glob.glob(os.path.join(sub_class_directory, '*.md')):
+                            with open(filename, 'r') as file:
+                                content = file.read()
+                                match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                                if match:
+                                    # Load the front matter
+                                    front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
+                                    # Create an instance of the class
+                                    instance_class_obj = globals()[sub_instance_class]
+                                    instance = instance_class_obj(**front_matter)
+                                    Registry.instances[instance_class][sub_instance_class].append(instance)
+                                    # Populate CoreRulebookValues.PLANETS
+                                    if instance_class == 'Planets':
+                                        CoreRulebookValues.PLANETS.append(os.path.splitext(os.path.basename(filename))[0])
+                                    # Populate CoreRulebookValues.ALIEN_TYPES
+                                    if instance_class == 'Aliens':
+                                        CoreRulebookValues.ALIEN_TYPES.append(sub_instance_class)
+
+class Aliens:
+    def __init__(self, name):
+        self.name = name
 
 class SocietyGenerator(CoreRulebookValues):
     def __init__(self):
@@ -480,7 +501,7 @@ class InfiltrationEncounter(CoreRulebookValues):
         self.label.setText(f"{positions[value]}")
         return value # important for save state tracking
 
-class Character:
+class Character(Aliens):
     def __init__(self, name, race, npc_class, lvl, hp, ac, speed, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, feats, field_hacks, gear, attacks):
         self.name = name
         self.race = race
