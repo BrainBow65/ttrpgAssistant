@@ -7,7 +7,7 @@ import yaml
 import re
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout
 
 class CoreRulebookValues(QWidget):
     FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects"
@@ -266,6 +266,11 @@ class Registry:
                         sub_instance_class = os.path.basename(sub_class_directory)
                         if sub_instance_class not in Registry.instances[instance_class]:
                             Registry.instances[instance_class][sub_instance_class] = []
+                        # Populate CoreRulebookValues.ALIEN_TYPES
+                        if instance_class == 'Aliens':
+                            CoreRulebookValues.ALIEN_TYPES.append(sub_instance_class)
+                        if instance_class == 'Planets':
+                                        CoreRulebookValues.PLANETS.append(os.path.splitext(os.path.basename(filename))[0])
                         for filename in glob.glob(os.path.join(sub_class_directory, '*.md')):
                             with open(filename, 'r') as file:
                                 content = file.read()
@@ -277,13 +282,7 @@ class Registry:
                                     instance_class_obj = globals()[sub_instance_class]
                                     instance = instance_class_obj(**front_matter)
                                     Registry.instances[instance_class][sub_instance_class].append(instance)
-                                    # Populate CoreRulebookValues.PLANETS
-                                    if instance_class == 'Planets':
-                                        CoreRulebookValues.PLANETS.append(os.path.splitext(os.path.basename(filename))[0])
-                                    # Populate CoreRulebookValues.ALIEN_TYPES
-                                    if instance_class == 'Aliens':
-                                        CoreRulebookValues.ALIEN_TYPES.append(sub_instance_class)
-
+                                    
 class Aliens:
     directory = CoreRulebookValues.FOLDER_PATH
     def __init__(self, name):
@@ -318,7 +317,7 @@ class SocietyGenerator(CoreRulebookValues):
         govNum = random.randint(1, 5)
         religNum = random.randint(1, 5)
         currentTechLvl = [random.randint(1, 5)]
-        currentAlien = [self.choose_random_value(CoreRulebookValues.ALIEN_TYPES) if random.random() < 0.7 else CoreRulebookValues.ALIEN_TYPES[0]]
+        currentAlien = [self.choose_random_value(CoreRulebookValues.ALIEN_TYPES) if random.random() < 0.7 else CoreRulebookValues.ALIEN_TYPES['Human']]
         currentGovType = [self.choose_random_value(CoreRulebookValues.GOV_TYPES) for _ in range(govNum)]
         currentCulture = [self.choose_random_value(CoreRulebookValues.CULTURE_TYPES) for _ in range(govNum)]
         currentRelig = [self.choose_random_value(CoreRulebookValues.RELIGION_TYPES) for _ in range(religNum)]
@@ -656,8 +655,7 @@ class InfiltrationEncounter(CoreRulebookValues):
         return value # important for save state tracking
 
 class Character(Aliens):
-    def __init__(self, name, race, npc_class, lvl, hp, ac, speed, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, feats, field_hacks, gear, attacks):
-        sub_instance_class = ''
+    def __init__(self, name=None, race=None, npc_class=None, lvl=None, hp=None, ac=None, speed=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, feats=None, field_hacks=None, gear=None, attacks=None):
         self.name = name
         self.race = race
         self.npc_class = npc_class
@@ -678,24 +676,90 @@ class Character(Aliens):
         self.gear = gear
         self.attacks = attacks
         self.proficiency_mod = proficiency_mod
-        Registry.add_instance(self, sub_instance_class)
 
 class NPC(Character):
+    @classmethod
+    def get_attribute_names(cls):
+        instance = cls()
+        return [attr for attr in instance.__dict__ if not callable(getattr(instance, attr)) and not attr.startswith("__") and attr != "directory"]
+
     def __init__(self):
         super().__init__()
-        sub_instance_class = ''
-        Registry.add_instance(self, sub_instance_class)
 
 class PC(Character):
     def __init__(self):
         super().__init__()
-        sub_instance_class = ''
-        Registry.add_instance(self, sub_instance_class)
+
+class CharacterCreator(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.input_fields={}
+        layout = QGridLayout(self)
+
+        npc_attribute_names = NPC.get_attribute_names()
+
+        row = 0
+        col = 0
+        for attr_name in npc_attribute_names:
+            label = QLabel(attr_name.capitalize())
+            input_field = QLineEdit()
+            input_field.setMaxLength(2)  # Set maximum length to 2 characters
+            layout.addWidget(label, row, col, Qt.AlignLeft)
+            layout.addWidget(input_field, row, col + 1)
+            self.input_fields[attr_name] = input_field
+
+            col += 2
+            if col >= 20:  # Start a new row after every 10 attributes
+                row += 1
+                col = 0
+
+        species_label = QLabel("Species")
+        layout.addWidget(species_label, row, 0, 1, 2)
+
+        # Checkbox for custom race
+        custom_checkbox = QCheckBox("Custom")
+        custom_checkbox.stateChanged.connect(self.toggle_custom_race)
+        layout.addWidget(custom_checkbox, row + 1, 0, 1, 2)
+
+        # Initially hidden combobox for Alien Types
+        self.alien_type_combobox = QComboBox()
+        self.alien_type_combobox.addItems([alien_type for alien_type in CoreRulebookValues.ALIEN_TYPES])
+        layout.addWidget(self.alien_type_combobox, row + 1, 2, 1, 2)
+
+        # Initially hidden input field for custom race
+        self.custom_race_input = QLineEdit()
+        self.custom_race_input.setMaxLength(20)  # Set maximum length to 20 characters
+        self.custom_race_input.setVisible(False)  # Initially not visible
+        layout.addWidget(self.custom_race_input, row + 1, 4, 1, 2)
+
+        # Button to create NPC instance
+        create_button = QPushButton("Create")
+        create_button.clicked.connect(self.create_npc_instance)
+        layout.addWidget(create_button, row + 1, 6, 1, 2)
+
+        self.setLayout(layout)
+
+    def toggle_custom_race(self, state):
+        is_custom_race = state == 2  # 2 corresponds to Qt.Checked
+        self.alien_type_combobox.setVisible(not is_custom_race)
+        self.custom_race_input.setVisible(is_custom_race)
+
+    def create_npc_instance(self):
+        new_npc = NPC()
+        for attr_name, input_field in self.input_fields.items():
+            setattr(new_npc, attr_name, input_field.text())
+
+        if self.custom_race_input.isVisible():
+            new_npc.race = self.custom_race_input.text()
+        else:
+            new_npc.race = self.alien_type_combobox.currentText()
+
+        Registry.add_instance(new_npc, new_npc.race)
 
 class Beast(CoreRulebookValues):
     def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):
         super().__init__()
-        sub_instance_class = ''
+        
         self.name = name
         self.cr = cr #challenge rating
         self.size = size
@@ -713,7 +777,7 @@ class Beast(CoreRulebookValues):
         self.saves = saves
         self.abilities = abilities
         self.attacks = attacks
-        Registry.add_instance(self, sub_instance_class)
+        
 
     def beak():
         dmg_type = 'slashing'
@@ -786,46 +850,46 @@ class Equipment:
 class Weapons(Equipment):
     def __init__(self, dmg, type, capacity, reload, range, special):
         super().__init__()
-        sub_instance_class = ''
+        
         self.dmg = dmg
         self.type = type
         self.capacity = capacity
         self.reload = reload
         self.range = range
         self.special = special
-        Registry.add_instance(self, sub_instance_class)
+        
 
 class Armor(Equipment):
     def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
         super().__init__()
-        sub_instance_class = ''
+        
         self.techlvl = techlvl
         self.type = type
         self.ac = ac
         self.strength = strength
         self.stealth = stealth
         self.special = special
-        Registry.add_instance(self, sub_instance_class)
+        
 
 class Gear(Equipment):
     def __init__(self, techlvl, bulk, description):
         super().__init__()
-        sub_instance_class = ''
+        
         self.techlvl = techlvl
         self.description = description
-        Registry.add_instance(self, sub_instance_class)
+        
 
 class Facilities:
     def __init__(self, name, bonusrating, bonustype):
-        sub_instance_class = ''
+        
         self.name = name
         self.bonusrating = bonusrating
         self.bonustype = bonustype
-        Registry.add_instance(self, sub_instance_class)
+        
 
 class Vehicles:
     def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
-        sub_instance_class = ''
+        
         self.name = name
         self.size = size
         self.handling = handling
@@ -835,4 +899,4 @@ class Vehicles:
         self.weapons = weapons
         self.hp = hp
         self.ac = ac
-        Registry.add_instance(self, sub_instance_class)
+        

@@ -32,9 +32,7 @@ class EncounterTab(T.CoreRulebookValues):
 
 class GeneratorTab(T.QWidget):
     def __init__(self):
-        super().__init__()
-        
-        
+        super().__init__() 
         layout = T.QVBoxLayout()
         nested_tab_widget = T.QTabWidget()
 
@@ -42,7 +40,8 @@ class GeneratorTab(T.QWidget):
         nested_tab_widget.addTab(planet_tab, "Planet Generator")
         society_tab = T.SocietyGenerator()
         nested_tab_widget.addTab(society_tab, "Society Generator")
-        
+        character_creator_tab = T.CharacterCreator()
+        nested_tab_widget.addTab(character_creator_tab, "Character Creator")
 
         layout.addWidget(nested_tab_widget)
         self.setLayout(layout)
