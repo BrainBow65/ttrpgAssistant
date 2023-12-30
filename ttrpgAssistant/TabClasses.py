@@ -86,12 +86,12 @@ class CoreRulebookValues(QWidget):
                       19:[],
                       20:[]}
     #NPC stat dictionary structure: {class:{CR:[lvl, ac, hp, speed(m), str, dex, con, int, wis, cha, proficiency modifier, {skills}, {saves}, [feats], [inspirations], [armor], [weapons]]}}
-    NPC_STATS_DICT = {'Diplomat':{0.5:[1, 10, 18, 6, 9, 10, 10, 13, 14, 16, 2, {'culture':4, 'deception':5, 'insight':4, 'persuasion':5}, {'wisdom':4, 'charisma':5}, ['calm & collected'], ['Dress Uniform'], ['Sidearm']],
-                                  1:[],
-                                  2:[],
-                                  3:[],
-                                  4:[],
-                                  5:[],
+    NPC_STATS_DICT = {'diplomat':{0.5:{'lvl':1, 'ac':10, 'hp':18,'speed':6, 'str':9, 'dex':10, 'con':10, 'int':13, 'wis':14, 'cha':16, 'proficiency_mod':2, 'skills':{'culture':4, 'deception':5, 'insight':4, 'persuasion':5}, 'saves':{'wisdom':4, 'charisma':5}, 'feats':['calm & collected'], 'field_hacks':None, 'armor':['Dress Uniform'], 'weapons':['Sidearm']},
+                                1:{},
+                                  2:{},
+                                  3:{},
+                                  4:{},
+                                  5:{},
                                   6:[],
                                   7:[],
                                   8:[],
@@ -106,7 +106,7 @@ class CoreRulebookValues(QWidget):
                                   17:[],
                                   18:[],
                                   19:[]},
-                        'Engineer':{0.5:[1, 16, 18, 6, 13, 14, 10, 9, 2, {'Engineering':5, 'Pilot':4, 'Perception':2}, {'Dexterity':4, 'Intelligence':5}, ['jury rig'], ['Armorer'], ['Bullet resistant vest'], ['longarm']],
+                        'engineer':{0.5:[1, 16, 18, 6, 13, 14, 10, 9, 2, {'Engineering':5, 'Pilot':4, 'Perception':2}, {'Dexterity':4, 'Intelligence':5}, ['jury rig'], ['Armorer'], ['Bullet resistant vest'], ['longarm']],
                                     1:[],
                                     2:[],
                                     3:[],
@@ -126,7 +126,7 @@ class CoreRulebookValues(QWidget):
                                     17:[],
                                     18:[],
                                     19:[]},
-                        'Medic':{0.5:[],
+                        'medic':{0.5:[],
                                  1:[],
                                  2:[],
                                  3:[],
@@ -146,7 +146,7 @@ class CoreRulebookValues(QWidget):
                                  17:[],
                                  18:[],
                                  19:[]},
-                        'Scientist':{0.5:[],
+                        'scientist':{0.5:[],
                                      1:[],
                                      2:[],
                                      3:[],
@@ -166,7 +166,7 @@ class CoreRulebookValues(QWidget):
                                      17:[],
                                      18:[],
                                      19:[]},
-                        'Scout':{0.5:[],
+                        'scout':{0.5:[],
                                  1:[],
                                  2:[],
                                  3:[],
@@ -186,7 +186,7 @@ class CoreRulebookValues(QWidget):
                                  17:[],
                                  18:[],
                                  19:[]},
-                        'Soldier':{0.5:[],
+                        'soldier':{0.5:[],
                                    1:[],
                                    2:[],
                                    3:[],
@@ -655,7 +655,7 @@ class InfiltrationEncounter(CoreRulebookValues):
         return value # important for save state tracking
 
 class Character(Aliens):
-    def __init__(self, name=None, race=None, npc_class=None, lvl=None, hp=None, ac=None, speed=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, feats=None, field_hacks=None, gear=None, attacks=None):
+    def __init__(self, name=None, race=None, npc_class=None, lvl=None, hp=None, ac=None, speed=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, feats=None, field_hacks=None, armor=None, weapons=None, gear=None, attacks=None):
         self.name = name
         self.race = race
         self.npc_class = npc_class
@@ -676,6 +676,8 @@ class Character(Aliens):
         self.gear = gear
         self.attacks = attacks
         self.proficiency_mod = proficiency_mod
+        self.armor = armor
+        self.weapons = weapons
 
 class NPC(Character):
     @classmethod
@@ -693,56 +695,100 @@ class PC(Character):
 class CharacterCreator(QWidget):
     def __init__(self):
         super().__init__()
-        self.input_fields={}
+        self.input_fields = {}  # Initialize input_fields here
         layout = QGridLayout(self)
 
-        npc_attribute_names = NPC.get_attribute_names()
+        # Input field for Class
+        class_label = QLabel("Class")
+        layout.addWidget(class_label, 0, 0, 1, 1, Qt.AlignLeft)
+        self.class_input = QLineEdit()
+        layout.addWidget(self.class_input, 0, 1)
 
-        row = 0
+        # Input field for Challenge Rating
+        cr_label = QLabel("Challenge Rating")
+        layout.addWidget(cr_label, 0, 2, 1, 1, Qt.AlignLeft)
+        self.cr_input = QLineEdit()
+        layout.addWidget(self.cr_input, 0, 3)
+
+        row = 1
         col = 0
-        for attr_name in npc_attribute_names:
-            label = QLabel(attr_name.capitalize())
-            input_field = QLineEdit()
-            input_field.setMaxLength(2)  # Set maximum length to 2 characters
-            layout.addWidget(label, row, col, Qt.AlignLeft)
-            layout.addWidget(input_field, row, col + 1)
-            self.input_fields[attr_name] = input_field
+        self.input_fields = {}
+        for attr_name, attr_value in vars(NPC()).items():
+            if not callable(attr_value) and not attr_name.startswith("__"):
+                label = QLabel(attr_name.capitalize())
+                input_field = QLineEdit(str(attr_value))  # Convert to string for display
+                input_field.setFixedWidth(30)
+                layout.addWidget(label, row, col, 1, 1, Qt.AlignRight)
+                layout.addWidget(input_field, row, col + 1, 1, 1)
+                self.input_fields[attr_name] = input_field
 
-            col += 2
-            if col >= 20:  # Start a new row after every 10 attributes
-                row += 1
-                col = 0
+                col += 2
+                if col >= 6:  # Start a new row after every 3 pairs of attributes
+                    row += 1
+                    col = 0
 
+        # Label for Species (on the row above the custom checkbox)
         species_label = QLabel("Species")
-        layout.addWidget(species_label, row, 0, 1, 2)
+        layout.addWidget(species_label, row+1, 0, 1, 2)  # Left-align the Species label
 
         # Checkbox for custom race
         custom_checkbox = QCheckBox("Custom")
         custom_checkbox.stateChanged.connect(self.toggle_custom_race)
-        layout.addWidget(custom_checkbox, row + 1, 0, 1, 2)
+        layout.addWidget(custom_checkbox, row + 2, 0, 1, 2)
 
-        # Initially hidden combobox for Alien Types
+        # Combobox for Alien Types
         self.alien_type_combobox = QComboBox()
         self.alien_type_combobox.addItems([alien_type for alien_type in CoreRulebookValues.ALIEN_TYPES])
-        layout.addWidget(self.alien_type_combobox, row + 1, 2, 1, 2)
+        layout.addWidget(self.alien_type_combobox, row + 2, 2, 1, 2)
 
-        # Initially hidden input field for custom race
+        # Input field for custom race
         self.custom_race_input = QLineEdit()
         self.custom_race_input.setMaxLength(20)  # Set maximum length to 20 characters
         self.custom_race_input.setVisible(False)  # Initially not visible
-        layout.addWidget(self.custom_race_input, row + 1, 4, 1, 2)
+        layout.addWidget(self.custom_race_input, row + 2, 4, 1, 2)
 
         # Button to create NPC instance
         create_button = QPushButton("Create")
         create_button.clicked.connect(self.create_npc_instance)
-        layout.addWidget(create_button, row + 1, 6, 1, 2)
+        layout.addWidget(create_button, row + 2, 6, 1, 2)
 
         self.setLayout(layout)
+
+        # Connect signals for dynamic updating
+        self.class_input.textChanged.connect(self.update_attribute_values)
+        self.cr_input.textChanged.connect(self.update_attribute_values)
 
     def toggle_custom_race(self, state):
         is_custom_race = state == 2  # 2 corresponds to Qt.Checked
         self.alien_type_combobox.setVisible(not is_custom_race)
         self.custom_race_input.setVisible(is_custom_race)
+
+    def update_attribute_values(self):
+        selected_class = self.class_input.text().lower()
+        selected_cr = self.cr_input.text()
+
+        try:
+            selected_cr = float(selected_cr)
+        except ValueError:
+            selected_cr = None
+
+        if selected_class and selected_cr is not None:
+            npc_stats = CoreRulebookValues.NPC_STATS_DICT.get(selected_class, {}).get(selected_cr, {})
+
+            if npc_stats:
+                for attr_name, input_field in self.input_fields.items():
+                    if attr_name in npc_stats:
+                        value = npc_stats[attr_name]
+
+                        # Check if the value is a dictionary
+                        if isinstance(value, dict):
+                            # Handle dictionary values by converting them to a string representation
+                            input_field.setText(str(value))
+                        else:
+                            # For other types, directly set the text
+                            input_field.setText(str(value))
+                    else:
+                        input_field.clear()
 
     def create_npc_instance(self):
         new_npc = NPC()
@@ -850,7 +896,6 @@ class Equipment:
 class Weapons(Equipment):
     def __init__(self, dmg, type, capacity, reload, range, special):
         super().__init__()
-        
         self.dmg = dmg
         self.type = type
         self.capacity = capacity
@@ -858,11 +903,9 @@ class Weapons(Equipment):
         self.range = range
         self.special = special
         
-
 class Armor(Equipment):
     def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
         super().__init__()
-        
         self.techlvl = techlvl
         self.type = type
         self.ac = ac
@@ -870,26 +913,20 @@ class Armor(Equipment):
         self.stealth = stealth
         self.special = special
         
-
 class Gear(Equipment):
     def __init__(self, techlvl, bulk, description):
         super().__init__()
-        
         self.techlvl = techlvl
         self.description = description
         
-
 class Facilities:
     def __init__(self, name, bonusrating, bonustype):
-        
         self.name = name
         self.bonusrating = bonusrating
         self.bonustype = bonustype
         
-
 class Vehicles:
     def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
-        
         self.name = name
         self.size = size
         self.handling = handling
