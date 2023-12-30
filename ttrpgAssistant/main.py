@@ -42,6 +42,7 @@ class GeneratorTab(T.QWidget):
         nested_tab_widget.addTab(planet_tab, "Planet Generator")
         society_tab = T.SocietyGenerator()
         nested_tab_widget.addTab(society_tab, "Society Generator")
+        
 
         layout.addWidget(nested_tab_widget)
         self.setLayout(layout)
@@ -71,9 +72,6 @@ class MainWindow(T.QMainWindow):
     combat_objects = []
     def __init__(self):
         super().__init__()
-        for folder_name in T.os.listdir(T.CoreRulebookValues.FOLDER_PATH):
-            if T.os.path.isdir(T.os.path.join(T.CoreRulebookValues.FOLDER_PATH, folder_name)):
-                T.CoreRulebookValues.ALIEN_TYPES.append(folder_name)
         self.settings = T.QSettings("RainbowElephantGaming", "StargateTTRPG")
         self.setWindowTitle("StargateTTRPG App")
         self.setGeometry(100, 100, 800, 600)

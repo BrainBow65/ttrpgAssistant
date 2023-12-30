@@ -14,7 +14,7 @@ class CoreRulebookValues(QWidget):
     PLANETS = []
     GEO_FEATURES = ["Anticline", "Basin", "Butte", "Cave", "Cliff", "Canyon", "Valley", "Bay", "Archipelago"]
     BIOMES = ["Arboreal", "Artificial", "Desert", "Grasslands", "Lunar", "Mountainous", "Oceanic", "Rainforest", "Starship", "Terraformed", "Toxic", "Tundra", "Subterranean", "Swamp", "Urban", "Volcanic"]
-    ALIEN_TYPES = ["Human", "Asgaridan", "Androids", "Aris bochs people", "Reol", "Nox", "Serrakin", "Mimetic aliens", "reetou", "replicators", "Goa'uld", "Jaffa", "Arturen", "Tok'ra", "Unas", "Unknown"]
+    ALIEN_TYPES = []
     GOV_TYPES = ["Democracy", "Dictatorship", "Theocracy", "Oligarchy", "Communist", "Monarchy", "Fascist", "Military"]
     CULTURE_TYPES = ["National", "Religion", "Ethnic Group", "Social Class", "Generational", "Organizational", "Gender"]
     RELIGION_TYPES = ["Goa'uld", "Asgardism", "Monotheism", "Polytheism, hard", "Polytheism soft", "Polytheism, henotheism", "Polytheism, Kathenotheism", "Polytheism, Monolatrism", "Pantheism", "Deism", "Autotheism", "Value-judgement theism, Eutheism", "Value-judgement theism, dystheism", "Value-judgement theism, maltheism", "Value-judgement theism, misotheism", "Spiritualism", "Atheism"]
@@ -64,7 +64,149 @@ class CoreRulebookValues(QWidget):
                      'Bomb':[2, '20d6', 'explosive', '', 5, 'see text?'],
                      'Missile': [2, '20d6', 'explosive', '5km/200km', 4, 'guided'],
                      'Railgun':[3, '8d6', 'piercing', '5km/400km',100, None]}
-    
+    #dictionary structure: {cr:[proficience, hit dice, str, dex, con, int, wis, cha AC, HP, speed (m), special]}
+    JAFFA_STATS:{1:[2, 3, 14, 12, 14, 8, 10, 14, 14, 20, 6, None],
+                      2:[],
+                      3:[],
+                      4:[],
+                      5:[],
+                      6:[],
+                      7:[],
+                      8:[],
+                      9:[],
+                      10:[],
+                      11:[],
+                      12:[],
+                      13:[],
+                      14:[],
+                      15:[],
+                      16:[],
+                      17:[],
+                      18:[],
+                      19:[],
+                      20:[]}
+    #NPC stat dictionary structure: {class:{CR:[lvl, ac, hp, speed(m), str, dex, con, int, wis, cha, proficiency modifier, {skills}, {saves}, [feats], [inspirations], [armor], [weapons]]}}
+    NPC_STATS_DICT = {'Diplomat':{0.5:[1, 10, 18, 6, 9, 10, 10, 13, 14, 16, 2, {'culture':4, 'deception':5, 'insight':4, 'persuasion':5}, {'wisdom':4, 'charisma':5}, ['calm & collected'], ['Dress Uniform'], ['Sidearm']],
+                                  1:[],
+                                  2:[],
+                                  3:[],
+                                  4:[],
+                                  5:[],
+                                  6:[],
+                                  7:[],
+                                  8:[],
+                                  9:[],
+                                  10:[],
+                                  11:[],
+                                  12:[],
+                                  13:[],
+                                  14:[],
+                                  15:[],
+                                  16:[],
+                                  17:[],
+                                  18:[],
+                                  19:[]},
+                        'Engineer':{0.5:[1, 16, 18, 6, 13, 14, 10, 9, 2, {'Engineering':5, 'Pilot':4, 'Perception':2}, {'Dexterity':4, 'Intelligence':5}, ['jury rig'], ['Armorer'], ['Bullet resistant vest'], ['longarm']],
+                                    1:[],
+                                    2:[],
+                                    3:[],
+                                    4:[],
+                                    5:[],
+                                    6:[],
+                                    7:[],
+                                    8:[],
+                                    9:[],
+                                    10:[],
+                                    11:[],
+                                    12:[],
+                                    13:[],
+                                    14:[],
+                                    15:[],
+                                    16:[],
+                                    17:[],
+                                    18:[],
+                                    19:[]},
+                        'Medic':{0.5:[],
+                                 1:[],
+                                 2:[],
+                                 3:[],
+                                 4:[],
+                                 5:[],
+                                 6:[],
+                                 7:[],
+                                 8:[],
+                                 9:[],
+                                 10:[],
+                                 11:[],
+                                 12:[],
+                                 13:[],
+                                 14:[],
+                                 15:[],
+                                 16:[],
+                                 17:[],
+                                 18:[],
+                                 19:[]},
+                        'Scientist':{0.5:[],
+                                     1:[],
+                                     2:[],
+                                     3:[],
+                                     4:[],
+                                     5:[],
+                                     6:[],
+                                     7:[],
+                                     8:[],
+                                     9:[],
+                                     10:[],
+                                     11:[],
+                                     12:[],
+                                     13:[],
+                                     14:[],
+                                     15:[],
+                                     16:[],
+                                     17:[],
+                                     18:[],
+                                     19:[]},
+                        'Scout':{0.5:[],
+                                 1:[],
+                                 2:[],
+                                 3:[],
+                                 4:[],
+                                 5:[],
+                                 6:[],
+                                 7:[],
+                                 8:[],
+                                 9:[],
+                                 10:[],
+                                 11:[],
+                                 12:[],
+                                 13:[],
+                                 14:[],
+                                 15:[],
+                                 16:[],
+                                 17:[],
+                                 18:[],
+                                 19:[]},
+                        'Soldier':{0.5:[],
+                                   1:[],
+                                   2:[],
+                                   3:[],
+                                   4:[],
+                                   5:[],
+                                   6:[],
+                                   7:[],
+                                   8:[],
+                                   9:[],
+                                   10:[],
+                                   11:[],
+                                   12:[],
+                                   13:[],
+                                   14:[],
+                                   15:[],
+                                   16:[],
+                                   17:[],
+                                   18:[],
+                                   19:[]}}
+
     def __init__(self):
         super().__init__()
 
@@ -73,33 +215,39 @@ class Registry:
     directory = CoreRulebookValues.FOLDER_PATH
     
     @staticmethod
-    def add_instance(instance):
+    #sub_instance_class is the name of the subdirectory the class instance should be saved in
+    def add_instance(instance, sub_instance_class):
         instance_class = type(instance).__name__
         if instance_class not in Registry.instances:
-            Registry.instances[instance_class] = []
-        Registry.instances[instance_class].append(instance)
+            Registry.instances[instance_class] = {}
+        if sub_instance_class not in Registry.instances[instance_class]:
+            Registry.instances[instance_class][sub_instance_class] = []
+        Registry.instances[instance_class][sub_instance_class].append(instance)
 
     @staticmethod
     def save_instances(directory):
         for instance_class, instances in Registry.instances.items():
             class_directory = os.path.join(directory, instance_class)
             os.makedirs(class_directory, exist_ok=True)
-            for instance in instances:
-                filename = os.path.join(class_directory, f'{instance.name}.md')
-                front_matter = {attr: value for attr, value in instance.__dict__.items() if attr != 'name'}
-                # Read the existing content
-                with open(filename, 'r') as file:
-                    content = file.read()
-                    match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                    if match:
-                        # Update the front matter
-                        content = content.replace(match.group(0), f'---\n{yaml.dump(front_matter)}---\n')
-                    else:
-                        # Add the front matter if it doesn't exist
-                        content = f'---\n{yaml.dump(front_matter)}---\n{content}'
-                # Write the updated content back to the file
-                with open(filename, 'w') as file:
-                    file.write(content)
+            for sub_instance_class, sub_instances in instances.items():
+                sub_class_directory = os.path.join(class_directory, sub_instance_class)
+                os.makedirs(sub_class_directory, exist_ok=True)
+                for instance in sub_instances:
+                    filename = os.path.join(sub_class_directory, f'{instance.name}.md')
+                    front_matter = {attr: value for attr, value in instance.__dict__.items() if attr != 'name'}
+                    # Read the existing content
+                    with open(filename, 'r') as file:
+                        content = file.read()
+                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                        if match:
+                            # Update the front matter
+                            content = content.replace(match.group(0), f'---\n{yaml.dump(front_matter)}---\n')
+                        else:
+                            # Add the front matter if it doesn't exist
+                            content = f'---\n{yaml.dump(front_matter)}---\n{content}'
+                    # Write the updated content back to the file
+                    with open(filename, 'w') as file:
+                        file.write(content)
 
     @staticmethod
     def load_instances(directory):
@@ -137,8 +285,14 @@ class Registry:
                                         CoreRulebookValues.ALIEN_TYPES.append(sub_instance_class)
 
 class Aliens:
+    directory = CoreRulebookValues.FOLDER_PATH
     def __init__(self, name):
         self.name = name
+        # Check if a folder with the same name as the class exists
+        class_directory = os.path.join(self.directory, self.__class__.__name__)
+        if not os.path.exists(class_directory):
+            # Create the folder if it doesn't exist
+            os.makedirs(class_directory)
 
 class SocietyGenerator(CoreRulebookValues):
     def __init__(self):
@@ -503,6 +657,7 @@ class InfiltrationEncounter(CoreRulebookValues):
 
 class Character(Aliens):
     def __init__(self, name, race, npc_class, lvl, hp, ac, speed, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, feats, field_hacks, gear, attacks):
+        sub_instance_class = ''
         self.name = name
         self.race = race
         self.npc_class = npc_class
@@ -523,14 +678,24 @@ class Character(Aliens):
         self.gear = gear
         self.attacks = attacks
         self.proficiency_mod = proficiency_mod
+        Registry.add_instance(self, sub_instance_class)
 
 class NPC(Character):
     def __init__(self):
         super().__init__()
+        sub_instance_class = ''
+        Registry.add_instance(self, sub_instance_class)
+
+class PC(Character):
+    def __init__(self):
+        super().__init__()
+        sub_instance_class = ''
+        Registry.add_instance(self, sub_instance_class)
 
 class Beast(CoreRulebookValues):
-    
     def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):
+        super().__init__()
+        sub_instance_class = ''
         self.name = name
         self.cr = cr #challenge rating
         self.size = size
@@ -548,8 +713,8 @@ class Beast(CoreRulebookValues):
         self.saves = saves
         self.abilities = abilities
         self.attacks = attacks
+        Registry.add_instance(self, sub_instance_class)
 
-    
     def beak():
         dmg_type = 'slashing'
     
@@ -621,41 +786,46 @@ class Equipment:
 class Weapons(Equipment):
     def __init__(self, dmg, type, capacity, reload, range, special):
         super().__init__()
+        sub_instance_class = ''
         self.dmg = dmg
         self.type = type
         self.capacity = capacity
         self.reload = reload
         self.range = range
         self.special = special
-
+        Registry.add_instance(self, sub_instance_class)
 
 class Armor(Equipment):
     def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
         super().__init__()
+        sub_instance_class = ''
         self.techlvl = techlvl
         self.type = type
         self.ac = ac
         self.strength = strength
         self.stealth = stealth
         self.special = special
-
+        Registry.add_instance(self, sub_instance_class)
 
 class Gear(Equipment):
     def __init__(self, techlvl, bulk, description):
         super().__init__()
+        sub_instance_class = ''
         self.techlvl = techlvl
         self.description = description
-
+        Registry.add_instance(self, sub_instance_class)
 
 class Facilities:
     def __init__(self, name, bonusrating, bonustype):
+        sub_instance_class = ''
         self.name = name
         self.bonusrating = bonusrating
         self.bonustype = bonustype
-
+        Registry.add_instance(self, sub_instance_class)
 
 class Vehicles:
     def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
+        sub_instance_class = ''
         self.name = name
         self.size = size
         self.handling = handling
@@ -665,3 +835,4 @@ class Vehicles:
         self.weapons = weapons
         self.hp = hp
         self.ac = ac
+        Registry.add_instance(self, sub_instance_class)
