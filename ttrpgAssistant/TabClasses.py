@@ -10,7 +10,8 @@ from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit
 
 class CoreRulebookValues(QWidget):
-    FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets"
+    FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects"
+    PLANETS = []
     GEO_FEATURES = ["Anticline", "Basin", "Butte", "Cave", "Cliff", "Canyon", "Valley", "Bay", "Archipelago"]
     BIOMES = ["Arboreal", "Artificial", "Desert", "Grasslands", "Lunar", "Mountainous", "Oceanic", "Rainforest", "Starship", "Terraformed", "Toxic", "Tundra", "Subterranean", "Swamp", "Urban", "Volcanic"]
     ALIEN_TYPES = ["Human", "Asgaridan", "Androids", "Aris bochs people", "Reol", "Nox", "Serrakin", "Mimetic aliens", "reetou", "replicators", "Goa'uld", "Jaffa", "Arturen", "Tok'ra", "Unas", "Unknown"]
@@ -69,7 +70,7 @@ class CoreRulebookValues(QWidget):
 
 class Registry:
     instances = {}
-    directory = 'c:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects' 
+    directory = CoreRulebookValues.FOLDER_PATH
     
     @staticmethod
     def add_instance(instance):
@@ -199,7 +200,7 @@ class SocietyGenerator(CoreRulebookValues):
         else:  
             self.message_label.setText(f"The file '{file_name}.md' could not be found in '{CoreRulebookValues.FOLDER_PATH}'.")
 
-class PlanetGenerator(CoreRulebookValues):
+class Planets(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -505,8 +506,6 @@ class Character:
 class NPC(Character):
     def __init__(self):
         super().__init__()
-
-
 
 class Beast(CoreRulebookValues):
     

@@ -30,19 +30,21 @@ class EncounterTab(T.CoreRulebookValues):
 
         self.setLayout(layout)
 
-        # Hypothetical state variables
-        self.some_state_variable = ""
-        self.another_state_variable = 0
-
 class GeneratorTab(T.QWidget):
     def __init__(self):
         super().__init__()
-        tab_widget = T.QTabWidget()
-        self.planet_tab = T.PlanetGenerator()
-        self.society_tab = T.SocietyGenerator()
+        
+        
+        layout = T.QVBoxLayout()
+        nested_tab_widget = T.QTabWidget()
 
-        tab_widget.addTab(self.planet_tab, "Planet Generator")
-        tab_widget.addTab(self.society_tab, "Society Generator")
+        planet_tab = T.Planets()
+        nested_tab_widget.addTab(planet_tab, "Planet Generator")
+        society_tab = T.SocietyGenerator()
+        nested_tab_widget.addTab(society_tab, "Society Generator")
+
+        layout.addWidget(nested_tab_widget)
+        self.setLayout(layout)
 
 class CombatTab(T.QWidget):
     def __init__(self, combatants):
@@ -69,7 +71,9 @@ class MainWindow(T.QMainWindow):
     combat_objects = []
     def __init__(self):
         super().__init__()
-
+        for folder_name in T.os.listdir(T.CoreRulebookValues.FOLDER_PATH):
+            if T.os.path.isdir(T.os.path.join(T.CoreRulebookValues.FOLDER_PATH, folder_name)):
+                T.CoreRulebookValues.ALIEN_TYPES.append(folder_name)
         self.settings = T.QSettings("RainbowElephantGaming", "StargateTTRPG")
         self.setWindowTitle("StargateTTRPG App")
         self.setGeometry(100, 100, 800, 600)
@@ -91,7 +95,7 @@ def main():
     window = MainWindow()
     window.show()
     app.aboutToQuit.connect(T.Registry.save_instances(T.Registry.directory))
-    T.sys.exit(app.exec_())
+    T.sys.exit(app.exec())
 
 if __name__ == '__main__':
     main()
