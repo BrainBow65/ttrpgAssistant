@@ -248,41 +248,66 @@ class Registry:
                     # Write the updated content back to the file
                     with open(filename, 'w') as file:
                         file.write(content)
+        Registry.instances = instances
 
     @staticmethod
     def load_instances(directory):
-        Registry.instances = {}
+        Registry.instances = {'Aliens':{}, 'Planets':{}}
         CoreRulebookValues.PLANETS = []
         CoreRulebookValues.ALIEN_TYPES = []
-        for root, dirs, files in os.walk(directory):
-            for dir in dirs:
-                class_directory = os.path.join(root, dir)
-                instance_class = os.path.basename(class_directory)
-                if instance_class not in Registry.instances:
-                    Registry.instances[instance_class] = {}
-                for subroot, subdirs, subfiles in os.walk(class_directory):
-                    for subdir in subdirs:
-                        sub_class_directory = os.path.join(subroot, subdir)
-                        sub_instance_class = os.path.basename(sub_class_directory)
-                        if sub_instance_class not in Registry.instances[instance_class]:
-                            Registry.instances[instance_class][sub_instance_class] = []
-                        # Populate CoreRulebookValues.ALIEN_TYPES
-                        if instance_class == 'Aliens':
-                            CoreRulebookValues.ALIEN_TYPES.append(sub_instance_class)
-                        if instance_class == 'Planets':
-                                        CoreRulebookValues.PLANETS.append(os.path.splitext(os.path.basename(filename))[0])
-                        for filename in glob.glob(os.path.join(sub_class_directory, '*.md')):
-                            with open(filename, 'r') as file:
-                                content = file.read()
-                                match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                                if match:
-                                    # Load the front matter
-                                    front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
-                                    # Create an instance of the class
-                                    instance_class_obj = globals()[sub_instance_class]
-                                    instance = instance_class_obj(**front_matter)
-                                    Registry.instances[instance_class][sub_instance_class].append(instance)
-                                    
+        for i, (root, dirs, files) in enumerate(os.walk(directory)):
+            # if root == os.path.join(directory, '*'):
+            if root == os.path.join(directory, 'Aliens'):
+                CoreRulebookValues.ALIEN_TYPES = dirs
+                for alien in dirs:
+                    if alien not in Registry.instances['Aliens']:
+                        Registry.instances['Aliens'][alien]= []
+
+            if root == os.path.join(directory, 'Planets'):
+                CoreRulebookValues.PLANETS = dirs
+                for planet in dirs:
+                    if planet not in Registry.instances['Planets']:
+                        Registry.instances['Planets'][planet]= []
+
+                variable_value = os.path.basename(root)
+
+            if root == os.path.join(directory, 'Aliens', '*'):
+                variable_value = os.path.basename(root)
+                for file in files:
+                    with open(os.path.join(root, file), 'r') as f:
+                        content = f.read()
+                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                        if match:
+                            # Load the front matter
+                            front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
+                            # Create an instance of the class
+                            instance_class_obj = globals()[NPC()]
+                            instance = instance_class_obj(**front_matter)
+                            Registry.instances['Aliens'][variable_value].append(instance)
+                        else:
+                            instance_class_obj = globals()[NPC()]
+                            instance = instance_class_obj()
+                            Registry.instances['Aliens'][variable_value].append(instance)
+            
+            if root == os.path.join(directory, 'Planets', '*'):
+                variable_value = os.path.basename(root)
+                for file in files:
+                    with open(os.path.join(root, file), 'r') as f:
+                        content = f.read()
+                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
+                        if match:
+                            # Load the front matter
+                            front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
+                            # Create an instance of the class
+                            instance_class_obj = globals()[NPC()]
+                            instance = instance_class_obj(**front_matter)
+                            Registry.instances['Aliens'][variable_value].append(instance)
+                        else:
+                            instance_class_obj = globals()[NPC()]
+                            instance = instance_class_obj()
+                            Registry.instances['Aliens'][variable_value].append(instance)
+        print(Registry.instances)
+                           
 class Aliens:
     directory = CoreRulebookValues.FOLDER_PATH
     def __init__(self, name):
