@@ -5,6 +5,7 @@ import string
 import glob
 import yaml
 import re
+import saveandload as S
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout
@@ -210,114 +211,6 @@ class CoreRulebookValues(QWidget):
     def __init__(self):
         super().__init__()
 
-class Registry:
-    instances = {}
-    directory = CoreRulebookValues.FOLDER_PATH
-    
-    @staticmethod
-    #sub_instance_class is the name of the subdirectory the class instance should be saved in
-    def add_instance(instance, sub_instance_class):
-        instance_class = type(instance).__name__
-        if instance_class not in Registry.instances:
-            Registry.instances[instance_class] = {}
-        if sub_instance_class not in Registry.instances[instance_class]:
-            Registry.instances[instance_class][sub_instance_class] = []
-        Registry.instances[instance_class][sub_instance_class].append(instance)
-
-    @staticmethod
-    def save_instances(directory):
-        for instance_class, instances in Registry.instances.items():
-            class_directory = os.path.join(directory, instance_class)
-            os.makedirs(class_directory, exist_ok=True)
-            for sub_instance_class, sub_instances in instances.items():
-                sub_class_directory = os.path.join(class_directory, sub_instance_class)
-                os.makedirs(sub_class_directory, exist_ok=True)
-                for instance in sub_instances:
-                    filename = os.path.join(sub_class_directory, f'{instance.name}.md')
-                    front_matter = {attr: value for attr, value in instance.__dict__.items() if attr != 'name'}
-                    # Read the existing content
-                    with open(filename, 'r') as file:
-                        content = file.read()
-                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                        if match:
-                            # Update the front matter
-                            content = content.replace(match.group(0), f'---\n{yaml.dump(front_matter)}---\n')
-                        else:
-                            # Add the front matter if it doesn't exist
-                            content = f'---\n{yaml.dump(front_matter)}---\n{content}'
-                    # Write the updated content back to the file
-                    with open(filename, 'w') as file:
-                        file.write(content)
-        Registry.instances = instances
-
-    @staticmethod
-    def load_instances(directory):
-        Registry.instances = {'Aliens':{}, 'Planets':{}}
-        CoreRulebookValues.PLANETS = []
-        CoreRulebookValues.ALIEN_TYPES = []
-        for i, (root, dirs, files) in enumerate(os.walk(directory)):
-            # if root == os.path.join(directory, '*'):
-            if root == os.path.join(directory, 'Aliens'):
-                CoreRulebookValues.ALIEN_TYPES = dirs
-                for alien in dirs:
-                    if alien not in Registry.instances['Aliens']:
-                        Registry.instances['Aliens'][alien]= []
-
-            if root == os.path.join(directory, 'Planets'):
-                CoreRulebookValues.PLANETS = dirs
-                for planet in dirs:
-                    if planet not in Registry.instances['Planets']:
-                        Registry.instances['Planets'][planet]= []
-
-                variable_value = os.path.basename(root)
-
-            if root == os.path.join(directory, 'Aliens', '*'):
-                variable_value = os.path.basename(root)
-                for file in files:
-                    with open(os.path.join(root, file), 'r') as f:
-                        content = f.read()
-                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                        if match:
-                            # Load the front matter
-                            front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
-                            # Create an instance of the class
-                            instance_class_obj = globals()[NPC()]
-                            instance = instance_class_obj(**front_matter)
-                            Registry.instances['Aliens'][variable_value].append(instance)
-                        else:
-                            instance_class_obj = globals()[NPC()]
-                            instance = instance_class_obj()
-                            Registry.instances['Aliens'][variable_value].append(instance)
-            
-            if root == os.path.join(directory, 'Planets', '*'):
-                variable_value = os.path.basename(root)
-                for file in files:
-                    with open(os.path.join(root, file), 'r') as f:
-                        content = f.read()
-                        match = re.search(r'---\n(.*?)\n---', content, re.DOTALL)
-                        if match:
-                            # Load the front matter
-                            front_matter = yaml.load(match.group(1), Loader=yaml.FullLoader)
-                            # Create an instance of the class
-                            instance_class_obj = globals()[NPC()]
-                            instance = instance_class_obj(**front_matter)
-                            Registry.instances['Aliens'][variable_value].append(instance)
-                        else:
-                            instance_class_obj = globals()[NPC()]
-                            instance = instance_class_obj()
-                            Registry.instances['Aliens'][variable_value].append(instance)
-        print(Registry.instances)
-                           
-class Aliens:
-    directory = CoreRulebookValues.FOLDER_PATH
-    def __init__(self, name):
-        self.name = name
-        # Check if a folder with the same name as the class exists
-        class_directory = os.path.join(self.directory, self.__class__.__name__)
-        if not os.path.exists(class_directory):
-            # Create the folder if it doesn't exist
-            os.makedirs(class_directory)
-
 class SocietyGenerator(CoreRulebookValues):
     def __init__(self):
         super().__init__()
@@ -399,7 +292,13 @@ class SocietyGenerator(CoreRulebookValues):
         else:  
             self.message_label.setText(f"The file '{file_name}.md' could not be found in '{CoreRulebookValues.FOLDER_PATH}'.")
 
-class Planets(CoreRulebookValues):
+class Planets:
+    def __init__(self, name=None, type = "Planets", biome=None):
+        self.name = name
+        self.biome = biome
+        self.type = type
+       
+class PlanetGenerator(CoreRulebookValues):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
@@ -679,9 +578,11 @@ class InfiltrationEncounter(CoreRulebookValues):
         self.label.setText(f"{positions[value]}")
         return value # important for save state tracking
 
-class Character(Aliens):
-    def __init__(self, name=None, race=None, npc_class=None, lvl=None, hp=None, ac=None, speed=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, feats=None, field_hacks=None, armor=None, weapons=None, gear=None, attacks=None):
+class Character:
+    def __init__(self, name=None, type="Aliens", race=None, npc_class=None, lvl=None, hp=None, ac=None, speed=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, feats=None, field_hacks=None, armor=None, weapons=None, gear=None, attacks=None):
+        super().__init__()
         self.name = name
+        self.type = type
         self.race = race
         self.npc_class = npc_class
         self.lvl = lvl
@@ -705,13 +606,9 @@ class Character(Aliens):
         self.weapons = weapons
 
 class NPC(Character):
-    @classmethod
-    def get_attribute_names(cls):
-        instance = cls()
-        return [attr for attr in instance.__dict__ if not callable(getattr(instance, attr)) and not attr.startswith("__") and attr != "directory"]
-
-    def __init__(self):
+    def __init__(self, cr = None):
         super().__init__()
+        self.cr = cr
 
 class PC(Character):
     def __init__(self):
@@ -740,9 +637,10 @@ class CharacterCreator(QWidget):
         self.input_fields = {}
         for attr_name, attr_value in vars(NPC()).items():
             if not callable(attr_value) and not attr_name.startswith("__"):
+                if attr_name == "npc_class" or attr_name == "race" or attr_name == "type" or attr_name == "cr":
+                    continue
                 label = QLabel(attr_name.capitalize())
                 input_field = QLineEdit(str(attr_value))  # Convert to string for display
-                input_field.setFixedWidth(30)
                 layout.addWidget(label, row, col, 1, 1, Qt.AlignRight)
                 layout.addWidget(input_field, row, col + 1, 1, 1)
                 self.input_fields[attr_name] = input_field
@@ -751,7 +649,6 @@ class CharacterCreator(QWidget):
                 if col >= 6:  # Start a new row after every 3 pairs of attributes
                     row += 1
                     col = 0
-
         # Label for Species (on the row above the custom checkbox)
         species_label = QLabel("Species")
         layout.addWidget(species_label, row+1, 0, 1, 2)  # Left-align the Species label
@@ -774,7 +671,10 @@ class CharacterCreator(QWidget):
 
         # Button to create NPC instance
         create_button = QPushButton("Create")
-        create_button.clicked.connect(self.create_npc_instance)
+        create_button.setEnabled(False)
+        if self.cr_input.text() and self.class_input.text() and self.input_fields['name']:
+            create_button.setEnabled(True)
+            create_button.clicked.connect(self.create_npc_instance)
         layout.addWidget(create_button, row + 2, 6, 1, 2)
 
         self.setLayout(layout)
@@ -817,15 +717,17 @@ class CharacterCreator(QWidget):
 
     def create_npc_instance(self):
         new_npc = NPC()
+        if self.cr_input.text() and self.class_input.text() and self.input_fields['name']:
+            print('Need to enter challenge rating, name, and class')
         for attr_name, input_field in self.input_fields.items():
             setattr(new_npc, attr_name, input_field.text())
-
+        new_npc.npc_class = self.class_input.text()
+        new_npc.cr = self.cr_input.text()
         if self.custom_race_input.isVisible():
             new_npc.race = self.custom_race_input.text()
         else:
             new_npc.race = self.alien_type_combobox.currentText()
-
-        Registry.add_instance(new_npc, new_npc.race)
+        print(Registry.instances)
 
 class Beast(CoreRulebookValues):
     def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):

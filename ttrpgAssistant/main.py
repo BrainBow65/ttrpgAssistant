@@ -1,4 +1,5 @@
 import TabClasses as T
+import saveandload as S
 
 class EncounterTab(T.CoreRulebookValues):
     def __init__(self):
@@ -36,7 +37,7 @@ class GeneratorTab(T.QWidget):
         layout = T.QVBoxLayout()
         nested_tab_widget = T.QTabWidget()
 
-        planet_tab = T.Planets()
+        planet_tab = T.PlanetGenerator()
         nested_tab_widget.addTab(planet_tab, "Planet Generator")
         society_tab = T.SocietyGenerator()
         nested_tab_widget.addTab(society_tab, "Society Generator")
@@ -87,12 +88,15 @@ class MainWindow(T.QMainWindow):
         self.setCentralWidget(tab_widget)
 
 def main():
-    T.Registry.load_instances(T.Registry.directory)
     app = T.QApplication(T.sys.argv)
+    registry = S.Registry()
     window = MainWindow()
     window.show()
+    print(T.Registry.instances)
     app.aboutToQuit.connect(T.Registry.save_instances(T.Registry.directory))
     T.sys.exit(app.exec())
 
+#something fucky is going on when using static methods to call registry methods. instead need to create instance of registry and use it to initialize and modify the instances dictionary
+#this is not working perfectly yet, need to learn how to communicate with the instance created on app start up
 if __name__ == '__main__':
     main()
