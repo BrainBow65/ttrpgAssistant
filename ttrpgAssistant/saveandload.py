@@ -4,10 +4,11 @@ class Registry:
     _instance = None
     instances = {}
     directory = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects"
-    def __new__(cls):
-       if not cls._instance:
-           cls._instance = super(Registry, cls).__new__(cls)
-       Registry.load_instances(Registry.directory)
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Registry, cls).__new__(cls, *args, **kwargs)
+        Registry.load_instances(Registry.directory)
+        return cls._instance
     
     def add_instance(instance):
         instance_class = instance.type

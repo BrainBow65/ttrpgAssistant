@@ -716,6 +716,7 @@ class CharacterCreator(QWidget):
                         input_field.clear()
 
     def create_npc_instance(self):
+        registry = S.Registry()
         new_npc = NPC()
         if self.cr_input.text() and self.class_input.text() and self.input_fields['name']:
             print('Need to enter challenge rating, name, and class')
@@ -727,12 +728,11 @@ class CharacterCreator(QWidget):
             new_npc.race = self.custom_race_input.text()
         else:
             new_npc.race = self.alien_type_combobox.currentText()
-        print(Registry.instances)
+        registry.add_instance(new_npc)
 
 class Beast(CoreRulebookValues):
-    def __init__(self, name, cr, size, type, hp, ac, str, dex, con, int, wis, cha, skills, proficiency_mod, saves, abilities, attacks):
+    def __init__(self, name=None, cr=None, size=None, type = "Beasts", hp=None, ac=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, abilities=None, attacks=None):
         super().__init__()
-        
         self.name = name
         self.cr = cr #challenge rating
         self.size = size
@@ -750,7 +750,6 @@ class Beast(CoreRulebookValues):
         self.saves = saves
         self.abilities = abilities
         self.attacks = attacks
-        
 
     def beak():
         dmg_type = 'slashing'
@@ -795,7 +794,6 @@ class Combatant:
         self.damage_bonus = damage_bonus
         self.initiative = initiative
 
-
     def attack(self, target):
         roll = random.randint(1, 20) + self.attack_bonus
         if roll >= target.ac:
@@ -815,45 +813,42 @@ class CombatGenerator:
     pass
 
 class Equipment:
-    def __init__(self, name, techlvl, bulk):
+    def __init__(self, name=None,type="Equipment", techlvl=None, bulk=None):
         self.name = name
         self.techlvl = techlvl
+        self.type = type
         self.bulk = bulk
 
 class Weapons(Equipment):
-    def __init__(self, dmg, type, capacity, reload, range, special):
+    def __init__(self, dmg, capacity, reload, range, special):
         super().__init__()
         self.dmg = dmg
-        self.type = type
         self.capacity = capacity
         self.reload = reload
         self.range = range
         self.special = special
         
 class Armor(Equipment):
-    def __init__(self, techlvl, type, ac, strength, stealth, bulk, special):
+    def __init__(self, ac, strength, stealth, special):
         super().__init__()
-        self.techlvl = techlvl
-        self.type = type
         self.ac = ac
         self.strength = strength
         self.stealth = stealth
         self.special = special
         
 class Gear(Equipment):
-    def __init__(self, techlvl, bulk, description):
+    def __init__(self, description):
         super().__init__()
-        self.techlvl = techlvl
         self.description = description
         
 class Facilities:
-    def __init__(self, name, bonusrating, bonustype):
+    def __init__(self, name=None, type="Facilities", bonusrating=None, bonustype=None):
         self.name = name
         self.bonusrating = bonusrating
         self.bonustype = bonustype
         
 class Vehicles:
-    def __init__(self, name, size, handling, speed, passengers, type, weapons, hp, ac):
+    def __init__(self, name=None, type="Vehicles", size=None, handling=None, speed=None, passengers=None, weapons=None, hp=None, ac=None):
         self.name = name
         self.size = size
         self.handling = handling
@@ -863,4 +858,3 @@ class Vehicles:
         self.weapons = weapons
         self.hp = hp
         self.ac = ac
-        
