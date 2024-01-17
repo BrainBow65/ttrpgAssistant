@@ -671,10 +671,8 @@ class CharacterCreator(QWidget):
 
         # Button to create NPC instance
         create_button = QPushButton("Create")
-        create_button.setEnabled(False)
-        if self.cr_input.text() and self.class_input.text() and self.input_fields['name']:
-            create_button.setEnabled(True)
-            create_button.clicked.connect(self.create_npc_instance)
+        create_button.setEnabled(True)
+        
         layout.addWidget(create_button, row + 2, 6, 1, 2)
 
         self.setLayout(layout)
@@ -682,6 +680,7 @@ class CharacterCreator(QWidget):
         # Connect signals for dynamic updating
         self.class_input.textChanged.connect(self.update_attribute_values)
         self.cr_input.textChanged.connect(self.update_attribute_values)
+        create_button.clicked.connect(self.create_npc_instance)
 
     def toggle_custom_race(self, state):
         is_custom_race = state == 2  # 2 corresponds to Qt.Checked
@@ -714,7 +713,7 @@ class CharacterCreator(QWidget):
                             input_field.setText(str(value))
                     else:
                         input_field.clear()
-
+            
     def create_npc_instance(self):
         registry = S.Registry()
         new_npc = NPC()
@@ -729,6 +728,7 @@ class CharacterCreator(QWidget):
         else:
             new_npc.race = self.alien_type_combobox.currentText()
         registry.add_instance(new_npc)
+        print(registry.instances)
 
 class Beast(CoreRulebookValues):
     def __init__(self, name=None, cr=None, size=None, type = "Beasts", hp=None, ac=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, abilities=None, attacks=None):

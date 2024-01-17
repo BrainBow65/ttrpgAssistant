@@ -92,8 +92,8 @@ def main():
     registry = S.Registry()
     window = MainWindow()
     window.show()
-    print(T.Registry.instances)
-    app.aboutToQuit.connect(registry.save_instances(S.Registry.directory))
+    print(S.Registry.instances)
+    app.aboutToQuit.connect(lambda:registry.save_instances())
     T.sys.exit(app.exec())
 
 #something fucky is going on when using static methods to call registry methods. instead need to create instance of registry and use it to initialize and modify the instances dictionary
