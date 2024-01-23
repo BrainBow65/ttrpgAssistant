@@ -8,7 +8,7 @@ import re
 import saveandload as S
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout, QSizePolicy
 
 class CoreRulebookValues(QWidget):
     FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects"
@@ -649,14 +649,20 @@ class CharacterCreator(QWidget):
                 if col >= 6:  # Start a new row after every 3 pairs of attributes
                     row += 1
                     col = 0
-        # Label for Species (on the row above the custom checkbox)
+        row+=1
+        self.text_box = QTextEdit("Description")
+        self.text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        layout.addWidget(self.text_box, row, 0, 1, 8)
+        
+        row+=1
         species_label = QLabel("Species")
-        layout.addWidget(species_label, row+1, 0, 1, 2)  # Left-align the Species label
+        layout.addWidget(species_label, row, 0, 1, 2)  # Left-align the Species label
 
         # Checkbox for custom race
+        row+=1
         custom_checkbox = QCheckBox("Custom")
         custom_checkbox.stateChanged.connect(self.toggle_custom_race)
-        layout.addWidget(custom_checkbox, row + 2, 0, 1, 2)
+        layout.addWidget(custom_checkbox, row, 0, 1, 2)
 
         # Combobox for Alien Types
         self.alien_type_combobox = QComboBox()
