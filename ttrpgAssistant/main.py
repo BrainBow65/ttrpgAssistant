@@ -92,7 +92,6 @@ def main():
     registry = S.Registry()
     window = MainWindow()
     window.show()
-    print(S.Registry.instances)
     app.aboutToQuit.connect(lambda:registry.save_instances())
     T.sys.exit(app.exec())
 

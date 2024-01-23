@@ -728,7 +728,6 @@ class CharacterCreator(QWidget):
         else:
             new_npc.race = self.alien_type_combobox.currentText()
         registry.add_instance(new_npc)
-        print(registry.instances)
 
 class Beast(CoreRulebookValues):
     def __init__(self, name=None, cr=None, size=None, type = "Beasts", hp=None, ac=None, str=None, dex=None, con=None, int=None, wis=None, cha=None, skills=None, proficiency_mod=None, saves=None, abilities=None, attacks=None):
