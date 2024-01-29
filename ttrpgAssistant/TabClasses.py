@@ -210,25 +210,80 @@ class CoreRulebookValues(QWidget):
                                    19:{'lvl':1,'ac':16, 'hp':22, 'speed':6, 'str':16, 'dex':13, 'con':14,'int':9,'wis':10, 'cha':10, 'proficiency_mod':2, 'skills':{'Athletics':5, 'Intimidation':2, 'Pilot':3}, 'saves':{'Strength':5, 'Constitution':4}, 'feats':['Tactical flexibility'], 'Tactics':['Defensive Posture'], 'Gear':['Chainmail'], 'weapons':['bludgeon']}}}
 
     def __init__(self):
-        super().__init__()
+        super().__init__() 
 
-class SocietyGenerator(CoreRulebookValues):
+class Planets:
+    def __init__(self, name=None, type = "Planets", biome=None, aliens=None, governments=None, cultures=None, religions=None):
+        self.name = name
+        self.biome = biome
+        self.type = type
+        self.aliens = aliens
+        self.governments = governments
+        self.cultures = cultures
+        self.religions = religions
+       
+class PlanetGenerator(QWidget):
     def __init__(self):
         super().__init__()
-        CURRENTALIABIL = []
-        layout = QVBoxLayout()
-        self.generate_button = QPushButton("Generate Society")
-        layout.addWidget(self.generate_button)
-        
-        self.file_name_input = QLineEdit()
-        layout.addWidget(self.file_name_input)
-        
-        self.message_label = QLabel()
-        layout.addWidget(self.message_label)
+        layout = QGridLayout()
 
-        self.setLayout(layout)
-        self.generate_button.clicked.connect(self.generate_society)
+        layout.addWidget(QLabel("Name"), 0, 0)
+        layout.addWidget(QLineEdit(), 0, 1)
 
+        
+    
+    def choose_geography(self):
+        num_values = random.randint(2, 6)
+        currentGeoFeatures = random.sample(self.geoFeatures, num_values)
+        return currentGeoFeatures
+    
+    def choose_biome(self):
+        return random.choice(CoreRulebookValues.BIOMES)
+    
+    def generate_name(self):
+        prefix = "P"
+        middle = random.choices(string.ascii_uppercase + string.digits, k=2)
+        suffix = str(random.randint(0, 999)).zfill(3)
+        return f"{prefix}{middle[0]}{middle[1]}-{suffix}.md"
+    
+    def check_name_availability(self, name, folder_path):
+        for filename in os.listdir(folder_path):
+            if filename.startswith(name[:7]):
+                return False
+        return True
+    
+    def generate_unique_name(self, folder_path):
+        while True:
+            name = self.generate_name()
+            if self.check_name_availability(name, folder_path):
+                return name
+    
+    def create_planet_file(self, content, name, folder_path):
+        file_name = name
+        file_path = os.path.join(folder_path, file_name)
+
+        with open(file_path, "a") as file:
+            file.write(content)
+        return file_name
+
+    def generate_planet(self):
+        currentGeoFeatures = self.choose_geography()
+        currentBiome = self.choose_biome()
+
+        name = self.generate_name()
+        while not self.check_name_availability(name, CoreRulebookValues.FOLDER_PATH):  # Pass FOLDER_PATH as the second argument
+            name = self.generate_name()
+
+        unique_name = self.generate_unique_name(CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
+        markdown_content = f"The new planet's biome is {currentBiome}\nThe nearby geological features are: {currentGeoFeatures}"
+        file_name = self.create_planet_file(markdown_content, unique_name, CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
+
+        with open('C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets/PJL-369.md', 'r') as f:
+            markdown_text = f.read()
+        self.text_edit.setMarkdown(markdown_text)
+        # Update the QLabel with the message
+        self.message_label.setText(f"Markdown file '{file_name}' created in '{CoreRulebookValues.FOLDER_PATH}'")
+    
     def choose_random_value(self, source_list):
         return random.choice(source_list)
     
@@ -292,81 +347,6 @@ class SocietyGenerator(CoreRulebookValues):
             self.message_label.setText(f"the following has been appended '{existing_file_path}'")
         else:  
             self.message_label.setText(f"The file '{file_name}.md' could not be found in '{CoreRulebookValues.FOLDER_PATH}'.")
-
-class Planets:
-    def __init__(self, name=None, type = "Planets", biome=None):
-        self.name = name
-        self.biome = biome
-        self.type = type
-       
-class PlanetGenerator(CoreRulebookValues):
-    def __init__(self):
-        super().__init__()
-        layout = QVBoxLayout()
-        self.text_edit = QTextEdit()
-        layout.addWidget(self.text_edit)
-        self.generate_button = QPushButton("Generate Planet")
-        layout.addWidget(self.generate_button)
-
-        # Create a QLabel to display the message
-        self.message_label = QLabel()
-        layout.addWidget(self.message_label)
-
-        self.setLayout(layout)
-
-        self.generate_button.clicked.connect(self.generate_planet)
-    
-    def choose_geography(self):
-        num_values = random.randint(2, 6)
-        currentGeoFeatures = random.sample(self.geoFeatures, num_values)
-        return currentGeoFeatures
-    
-    def choose_biome(self):
-        return random.choice(CoreRulebookValues.BIOMES)
-    
-    def generate_name(self):
-        prefix = "P"
-        middle = random.choices(string.ascii_uppercase + string.digits, k=2)
-        suffix = str(random.randint(0, 999)).zfill(3)
-        return f"{prefix}{middle[0]}{middle[1]}-{suffix}.md"
-    
-    def check_name_availability(self, name, folder_path):
-        for filename in os.listdir(folder_path):
-            if filename.startswith(name[:7]):
-                return False
-        return True
-    
-    def generate_unique_name(self, folder_path):
-        while True:
-            name = self.generate_name()
-            if self.check_name_availability(name, folder_path):
-                return name
-    
-    def create_planet_file(self, content, name, folder_path):
-        file_name = name
-        file_path = os.path.join(folder_path, file_name)
-
-        with open(file_path, "a") as file:
-            file.write(content)
-        return file_name
-
-    def generate_planet(self):
-        currentGeoFeatures = self.choose_geography()
-        currentBiome = self.choose_biome()
-
-        name = self.generate_name()
-        while not self.check_name_availability(name, CoreRulebookValues.FOLDER_PATH):  # Pass FOLDER_PATH as the second argument
-            name = self.generate_name()
-
-        unique_name = self.generate_unique_name(CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
-        markdown_content = f"The new planet's biome is {currentBiome}\nThe nearby geological features are: {currentGeoFeatures}"
-        file_name = self.create_planet_file(markdown_content, unique_name, CoreRulebookValues.FOLDER_PATH)  # Pass FOLDER_PATH as an argument
-
-        with open('C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/Planets/PJL-369.md', 'r') as f:
-            markdown_text = f.read()
-        self.text_edit.setMarkdown(markdown_text)
-        # Update the QLabel with the message
-        self.message_label.setText(f"Markdown file '{file_name}' created in '{CoreRulebookValues.FOLDER_PATH}'")
 
 class ConvinceEncounter(CoreRulebookValues):
     def __init__(self):
