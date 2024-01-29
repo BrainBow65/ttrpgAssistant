@@ -213,9 +213,10 @@ class CoreRulebookValues(QWidget):
         super().__init__() 
 
 class Planets:
-    def __init__(self, name=None, type = "Planets", biome=None, aliens=None, governments=None, cultures=None, religions=None):
+    def __init__(self, name=None, type = "Planets", biome=None, geofeatures=None , aliens=None, governments=None, cultures=None, religions=None):
         self.name = name
         self.biome = biome
+        self.geofeatures = geofeatures
         self.type = type
         self.aliens = aliens
         self.governments = governments
@@ -230,7 +231,19 @@ class PlanetGenerator(QWidget):
         layout.addWidget(QLabel("Name"), 0, 0)
         layout.addWidget(QLineEdit(), 0, 1)
 
-        
+        #assign the relevant lists from corerulebookvalues to a list then use the following code to iterate through the list
+        #lists = [biomes, aliens, governments, cultures, religions]
+        # list_names = ["Biomes", "Aliens", "Governments", "Cultures", "Religions"]
+
+        # for i, list_name in enumerate(list_names):
+        #     layout.addWidget(QLabel(list_name), i+1, 0)
+        #     for j, item in enumerate(lists[i]):
+        #         checkbox = QCheckBox(item)
+        #         layout.addWidget(checkbox, i+1, j+1)
+
+        # self.setLayout(layout)
+
+        #also want to add random buttons after each option to trigger functions to select random values that I don't want to choose myself
     
     def choose_geography(self):
         num_values = random.randint(2, 6)
