@@ -235,30 +235,35 @@ class PlanetGenerator(QWidget):
         lists = [CoreRulebookValues.BIOMES, CoreRulebookValues.ALIEN_TYPES, CoreRulebookValues.GOV_TYPES, CoreRulebookValues.CULTURE_TYPES,CoreRulebookValues.RELIGION_TYPES, CoreRulebookValues.GEO_FEATURES]
         list_names = ["Biomes", "Aliens", "Governments", "Cultures", "Religions", "Geographical Features"]
 
-        for i, list_name in enumerate(list_names):
-            layout.addWidget(QLabel(list_name), i*2+1, 0)
-            listWidget = QListWidget()
-            listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        for i in range(0, len(list_names), 2):
+            layout.addWidget(QLabel(list_names[i]), i+1, 0)
+            listWidget1 = QListWidget()
+            listWidget1.setSelectionMode(QAbstractItemView.MultiSelection)
             for item in lists[i]:
-                listWidget.addItem(QListWidgetItem(item))
-            fm = QFontMetrics(listWidget.font())
+                listWidget1.addItem(QListWidgetItem(item))
+            fm = QFontMetrics(listWidget1.font())
             maxWidth = fm.horizontalAdvance('M' * 25)
-            maxHeight = fm.lineSpacing() * 4
-            listWidget.setMaximumWidth(maxWidth)
-            listWidget.setMaximumHeight(maxHeight)
-            layout.addWidget(listWidget, i*2+1, 1)
-            randomButton = QPushButton("Random")
-            layout.addWidget(randomButton, i*2+1, 2)
-            addButton = QPushButton("Add")
-            layout.addWidget(addButton, i*2+2, 1)
-            removeButton = QPushButton("Remove")
-            layout.addWidget(removeButton, i*2+2, 3)
-            textField = QLineEdit()
-            textField.setMaximumWidth(maxWidth)
-            textField.setMaximumHeight(maxHeight)
-            layout.addWidget(textField, i*2+1, 3)
+            maxHeight = fm.lineSpacing() * 6
+            listWidget1.setMaximumWidth(maxWidth)
+            listWidget1.setMaximumHeight(maxHeight)
+            layout.addWidget(listWidget1, i+1, 1)
+            randomButton1 = QPushButton("Random")
+            layout.addWidget(randomButton1, i+1, 2)
+
+            if i+1 < len(list_names):
+                layout.addWidget(QLabel(list_names[i+1]), i+1, 3)
+                listWidget2 = QListWidget()
+                listWidget2.setSelectionMode(QAbstractItemView.MultiSelection)
+                for item in lists[i+1]:
+                    listWidget2.addItem(QListWidgetItem(item))
+                listWidget2.setMaximumWidth(maxWidth)
+                listWidget2.setMaximumHeight(maxHeight)
+                layout.addWidget(listWidget2, i+1, 4)
+                randomButton2 = QPushButton("Random")
+                layout.addWidget(randomButton2, i+1, 5)
+
         createButton = QPushButton("Create")
-        layout.addWidget(createButton, len(list_names)*2+2, 3)
+        layout.addWidget(createButton, len(list_names)//2+3, 5)
         self.setLayout(layout)
 
 #layout is looking good but I need to add functionality for every button
