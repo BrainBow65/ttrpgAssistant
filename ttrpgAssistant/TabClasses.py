@@ -8,7 +8,8 @@ import re
 import saveandload as S
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout, QSizePolicy
+from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QLineEdit, QTextEdit, QComboBox, QCheckBox, QGridLayout, QSizePolicy, QListWidget, QListWidgetItem, QAbstractItemView
+from PySide6.QtGui import QFontMetrics
 
 class CoreRulebookValues(QWidget):
     FOLDER_PATH = "C:/Users/Michelle/Documents/Obsidian Notes/StargateTTRPG/GameObjects"
@@ -231,23 +232,39 @@ class PlanetGenerator(QWidget):
         layout.addWidget(QLabel("Name"), 0, 0)
         layout.addWidget(QLineEdit(), 0, 1)
 
-        #assign the relevant lists from corerulebookvalues to a list then use the following code to iterate through the list
-        #lists = [biomes, aliens, governments, cultures, religions]
-        # list_names = ["Biomes", "Aliens", "Governments", "Cultures", "Religions"]
+        lists = [CoreRulebookValues.BIOMES, CoreRulebookValues.ALIEN_TYPES, CoreRulebookValues.GOV_TYPES, CoreRulebookValues.CULTURE_TYPES,CoreRulebookValues.RELIGION_TYPES, CoreRulebookValues.GEO_FEATURES]
+        list_names = ["Biomes", "Aliens", "Governments", "Cultures", "Religions", "Geographical Features"]
 
-        # for i, list_name in enumerate(list_names):
-        #     layout.addWidget(QLabel(list_name), i+1, 0)
-        #     for j, item in enumerate(lists[i]):
-        #         checkbox = QCheckBox(item)
-        #         layout.addWidget(checkbox, i+1, j+1)
+        for i, list_name in enumerate(list_names):
+            layout.addWidget(QLabel(list_name), i*2+1, 0)
+            listWidget = QListWidget()
+            listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+            for item in lists[i]:
+                listWidget.addItem(QListWidgetItem(item))
+            fm = QFontMetrics(listWidget.font())
+            maxWidth = fm.horizontalAdvance('M' * 25)
+            maxHeight = fm.lineSpacing() * 4
+            listWidget.setMaximumWidth(maxWidth)
+            listWidget.setMaximumHeight(maxHeight)
+            layout.addWidget(listWidget, i*2+1, 1)
+            randomButton = QPushButton("Random")
+            layout.addWidget(randomButton, i*2+1, 2)
+            addButton = QPushButton("Add")
+            layout.addWidget(addButton, i*2+2, 1)
+            removeButton = QPushButton("Remove")
+            layout.addWidget(removeButton, i*2+2, 3)
+            textField = QLineEdit()
+            textField.setMaximumWidth(maxWidth)
+            textField.setMaximumHeight(maxHeight)
+            layout.addWidget(textField, i*2+1, 3)
+        createButton = QPushButton("Create")
+        layout.addWidget(createButton, len(list_names)*2+2, 3)
+        self.setLayout(layout)
 
-        # self.setLayout(layout)
-
-        #also want to add random buttons after each option to trigger functions to select random values that I don't want to choose myself
-    
+#layout is looking good but I need to add functionality for every button
     def choose_geography(self):
         num_values = random.randint(2, 6)
-        currentGeoFeatures = random.sample(self.geoFeatures, num_values)
+        currentGeoFeatures = random.sample(CoreRulebookValues.GEO_FEATURES, num_values)
         return currentGeoFeatures
     
     def choose_biome(self):
