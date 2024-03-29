@@ -41,6 +41,9 @@ class GeneratorTab(T.QWidget):
         nested_tab_widget.addTab(planet_tab, "Planet Generator")
         character_creator_tab = T.CharacterCreator()
         nested_tab_widget.addTab(character_creator_tab, "Character Creator")
+        beast_creator_tab = T.BeastCreator()
+        nested_tab_widget.addTab(beast_creator_tab, "Beast Creator")
+        
 
         layout.addWidget(nested_tab_widget)
         self.setLayout(layout)

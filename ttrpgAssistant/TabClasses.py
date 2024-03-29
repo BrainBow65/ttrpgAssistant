@@ -230,10 +230,11 @@ class PlanetGenerator(QWidget):
         layout = QGridLayout()
 
         layout.addWidget(QLabel("Name"), 0, 0)
-        layout.addWidget(QLineEdit(), 0, 1)
+        #layout.addWidget(QLineEdit(), 0, 1)
 
         lists = [CoreRulebookValues.BIOMES, CoreRulebookValues.ALIEN_TYPES, CoreRulebookValues.GOV_TYPES, CoreRulebookValues.CULTURE_TYPES,CoreRulebookValues.RELIGION_TYPES, CoreRulebookValues.GEO_FEATURES]
         list_names = ["Biomes", "Aliens", "Governments", "Cultures", "Religions", "Geographical Features"]
+        buttonList = []
 
         for i in range(0, len(list_names), 2):
             layout.addWidget(QLabel(list_names[i]), i+1, 0)
@@ -248,6 +249,8 @@ class PlanetGenerator(QWidget):
             listWidget1.setMaximumHeight(maxHeight)
             layout.addWidget(listWidget1, i+1, 1)
             randomButton1 = QPushButton("Random")
+            randomButton1.setObjectName("randomButton" + str(i))
+            buttonList.append(randomButton1)
             layout.addWidget(randomButton1, i+1, 2)
 
             if i+1 < len(list_names):
@@ -260,6 +263,8 @@ class PlanetGenerator(QWidget):
                 listWidget2.setMaximumHeight(maxHeight)
                 layout.addWidget(listWidget2, i+1, 4)
                 randomButton2 = QPushButton("Random")
+                randomButton2.setObjectName("randomButton" + str(i+1))
+                buttonList.append(randomButton2)
                 layout.addWidget(randomButton2, i+1, 5)
 
         createButton = QPushButton("Create")
@@ -382,6 +387,9 @@ class PlanetGenerator(QWidget):
             self.message_label.setText(f"the following has been appended '{existing_file_path}'")
         else:  
             self.message_label.setText(f"The file '{file_name}.md' could not be found in '{CoreRulebookValues.FOLDER_PATH}'.")
+    
+    def create_planet_instance(self):
+        pass
 
 class ConvinceEncounter(CoreRulebookValues):
     def __init__(self):
@@ -450,6 +458,9 @@ class ConvinceEncounter(CoreRulebookValues):
 
             if self.calculate_round_result(threshold, determination_point_wager, num_players):
                 break
+
+class BeastCreator(QWidget):
+    pass
 
 class DiplomaticEncounter(CoreRulebookValues):
     def __init__(self):
