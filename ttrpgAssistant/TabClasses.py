@@ -210,6 +210,15 @@ class CoreRulebookValues(QWidget):
                                    18:{'lvl':1,'ac':16, 'hp':22, 'speed':6, 'str':16, 'dex':13, 'con':14,'int':9,'wis':10, 'cha':10, 'proficiency_mod':2, 'skills':{'Athletics':5, 'Intimidation':2, 'Pilot':3}, 'saves':{'Strength':5, 'Constitution':4}, 'feats':['Tactical flexibility'], 'Tactics':['Defensive Posture'], 'Gear':['Chainmail'], 'weapons':['bludgeon']},
                                    19:{'lvl':1,'ac':16, 'hp':22, 'speed':6, 'str':16, 'dex':13, 'con':14,'int':9,'wis':10, 'cha':10, 'proficiency_mod':2, 'skills':{'Athletics':5, 'Intimidation':2, 'Pilot':3}, 'saves':{'Strength':5, 'Constitution':4}, 'feats':['Tactical flexibility'], 'Tactics':['Defensive Posture'], 'Gear':['Chainmail'], 'weapons':['bludgeon']}}}
 
+    MISSION_PREP_RATING = {0:'characters are not issued a base kit and are generally assumed to be wearing civilian clothes or an unarmored uniform. They are also not armed, unless the GM deems the setting appropriate to carry a sidearm (such as within the Phoenix Site). These missions are frequently non-violent, such as diplomatic trips to speak with United States Senators',
+                           1:'actical Vest & 3 Uniforms, MREs (mission duration), Combat Knife (Shortblade, Tech Level 2), Personal Tactical Radio, Flashlight, Water Purifier, Filtration/Radiation Mask, Multi-tool, Personal Medical Kit, Extended Climate Protection Clothing, Combat Tent, Sidearm (Beretta M9) w/2 magazines, Longarm (FN P90 or Mossberg 500) w/2 magazines',
+                           2:' General supplies to refill each team member’s base kit 3 times,  3 spare FN P90s,  6 spare Beretta M9s,  3 additional combat tents,  3 additional multi-tools,  Inflatable Boat,  3 months MREs per team member,  3 Medical Kits,  5km of nylon rope line (Rope, Tech Level 2),  Service & repair tools,  5 35kg bags of Concrete (0.5 cubic meters per bag),  Solar Recharging Station,  Assorted replacement electronics (bulbs, wire, batteries, ect.), 3 Generators w/3 months of fuel,  10,000 rounds sidearm ammunition,  10,000 rounds longarm ammunition',
+                           3: ' General supplies to refill each team member’s base kit 12 times.  6 additional combat tents,  3 additional multi-tools,  Inflatable Boat,  6 months MREs per team member,  Medical Tent (fully stocked),  5km of nylon ropeline (Rope, Tech Level 2), Service & repair tools,  10 35kg bags of Concrete (0.5 cubic meters per bag),  Solar Recharging Station,  Assorted replacement electronics (bulbs, wire, batteries, ect.),  3 Generators w/6 months of fuel,  Tactical radio relay,  50,000 rounds sidearm ammunition,  50,000 rounds longarm ammunition,  1 ATV per team member + 2 spare ATVs',
+                           4: 'A Stargate team (as a group) is issued the Frontline kit for long duration missions. The base facilities have 3 Extended Camp kits’ worth of supplies, as well as fabrication and repair facilities. The raw materials and support equipment provide advantage on checks to make repairs at a 4-Prep base camp, and new items may be manufactured without disadvantage'}
+
+    WEAPON_TYPES = {'blast':'', 'finesse':'', 'flexible':'', 'grenade':'', 'guided':'', 'knockdown':'', 'pistol':'', 'recharge':'', 'scatter':'', 'shockwave':''}
+
+    FEATS = {}
     def __init__(self):
         super().__init__() 
 
@@ -852,25 +861,30 @@ class Equipment:
         self.bulk = bulk
 
 class Weapons(Equipment):
-    def __init__(self, dmg, capacity, reload, range, special):
+    def __init__(self, dmg, type, capacity, reload, range, bulk, special):
         super().__init__()
         self.dmg = dmg
+        self.type = type
         self.capacity = capacity
         self.reload = reload
         self.range = range
         self.special = special
+        self.bulk = bulk
         
 class Armor(Equipment):
-    def __init__(self, ac, strength, stealth, special):
+    def __init__(self, ac, techlvl, type, strength, stealth, special):
         super().__init__()
         self.ac = ac
+        self.techlvl = techlvl
+        self.type = type
         self.strength = strength
         self.stealth = stealth
         self.special = special
         
 class Gear(Equipment):
-    def __init__(self, description):
+    def __init__(self, techlvl, description):
         super().__init__()
+        self.techlvl = techlvl
         self.description = description
         
 class Facilities:
@@ -880,10 +894,11 @@ class Facilities:
         self.bonustype = bonustype
         
 class Vehicles:
-    def __init__(self, name=None, type="Vehicles", size=None, handling=None, speed=None, passengers=None, weapons=None, hp=None, ac=None):
+    def __init__(self, techlvl, name=None, type="Vehicles", size=None, handling=None, speed=None, passengers=None, weapons=None, hp=None, ac=None):
         self.name = name
         self.size = size
         self.handling = handling
+        self.techlvl = techlvl
         self.speed = speed
         self.passengers = passengers
         self.type = type
