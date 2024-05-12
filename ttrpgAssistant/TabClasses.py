@@ -5,6 +5,8 @@ import string
 import glob
 import yaml
 import re
+import json
+import PySide6.QtWidgets
 import saveandload as S
 from pathlib import Path
 from PySide6.QtCore import QSettings, Qt
@@ -232,6 +234,9 @@ class Planets:
         self.governments = governments
         self.cultures = cultures
         self.religions = religions
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
        
 class PlanetGenerator(QWidget):
     def __init__(self):
@@ -642,9 +647,15 @@ class Character:
         self.weapons = weapons
 
 class NPC(Character):
-    def __init__(self, cr = None):
+    def __init__(self, cr = None, disposition = None, occupation = None, goal = None, attitude = None, stake = None):
         super().__init__()
         self.cr = cr
+        self.disposition = disposition
+        self.occupation = occupation
+        self.goal = goal
+        self.attitude = attitude
+        self.stake = stake
+        # do I want to add a courage rating and number of extras? p. 298
 
 class PC(Character):
     def __init__(self):

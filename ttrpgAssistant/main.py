@@ -77,6 +77,9 @@ class MainWindow(T.QMainWindow):
         self.setWindowTitle("StargateTTRPG App")
         self.setGeometry(100, 100, 800, 600)
 
+        self.menu = self.menuBar()
+        self.file_menu = self.meu.addMenu("File")
+
         self.generator_tab = GeneratorTab()
         self.encounter_tab = EncounterTab()
         self.combat_tab = CombatTab(MainWindow.combat_objects)
@@ -100,3 +103,8 @@ def main():
 #this is not working perfectly yet, need to learn how to communicate with the instance created on app start up
 if __name__ == '__main__':
     main()
+#in the documentation for pyside6 it explains how to save binary files inside an application, maybe look into this for saving classes?
+#https://doc-snapshots.qt.io/qtforpython-dev/PySide6/QtCore/QSaveFile.html
+
+#the following link seems to address specifically using .md files for editing
+#https://doc.qt.io/qtforpython-6/PySide6/QtGui/QTextDocument.html
